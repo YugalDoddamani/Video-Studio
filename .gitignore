@@ -1,0 +1,32 @@
+# Dependencies
+node_modules/
+
+# ---------------------------------------------------------------------------
+# Generated render artifacts
+#
+# A 1290-frame render is ~880 MB of PNGs. Frames are fully reproducible from
+# scenes.json, so they stay out of git. Delete them with:
+#   npm run clean -- <slug> --frames --yes
+# ---------------------------------------------------------------------------
+digital-suspense-studio/projects/**/frames/
+digital-suspense-studio/projects/**/preview/frames/
+
+# Component gallery output (regenerate with: npm run gallery)
+digital-suspense-studio/preview/
+
+# ---------------------------------------------------------------------------
+# Keep the deliverables: the encoded film, the contact sheet, and the report
+# are small enough to review from a clone.
+# ---------------------------------------------------------------------------
+!digital-suspense-studio/projects/**/output/final.mp4
+!digital-suspense-studio/projects/**/preview/contact-sheet.png
+
+# Logs and OS noise
+*.log
+npm-debug.log*
+.DS_Store
+Thumbs.db
+
+# Local overrides
+.env
+.env.local

@@ -110,6 +110,41 @@ Inputs:
 
 A story does not need every scene type.
 
+## Implemented registry
+
+The code lives in `src/stage/components.js` and `src/stage/scenes.js`.
+
+Components: `StatusBar`, `NotificationCard`, `MessageThread`, `TypingIndicator`,
+`IncomingCall`, `Waveform`, `Transcript`, `VoiceNote`, `SystemAlert`,
+`FictionLabel`, `EndCard`, plus two scene extensions: `RainyStreet` and
+`PhoneReflection`.
+
+Scene types and the components they compose:
+
+| Scene type | Composition |
+| --- | --- |
+| `lock-screen` | StatusBar + clock + NotificationCard + FictionLabel |
+| `notification` | StatusBar + NotificationCard (+ optional SystemAlert) |
+| `voice-note` | AppHeader + VoiceNote (Waveform + Transcript) |
+| `incoming-call` | IncomingCall |
+| `message-thread` | AppHeader + MessageThread (bubbles + TypingIndicator) |
+| `system-alert` | SystemAlert |
+| `street` | RainyStreet |
+| `reflection` | PhoneReflection |
+| `end-card` | EndCard + FictionLabel |
+
+Every renderer is a pure function of `(scene, frameState)`. A component receives
+plain props and returns an HTML string; it is never allowed to read the clock,
+`Math.random`, or the network. This is what `npm run determinism` verifies.
+
+### Adding a scene type
+
+1. Write a `renderX(scene, state)` function in `src/stage/scenes.js`.
+2. Register it in the `SCENES` map with a human-readable label.
+3. Add styles to `src/stage/style.css`.
+4. Add it to the gallery config in `src/lib/gallery.js`.
+5. Run `npm run gallery` and look at the result.
+
 ## Component rules
 
 - Components must use the shared palette and typography.

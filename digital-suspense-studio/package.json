@@ -1,0 +1,33 @@
+{
+  "name": "digital-suspense-studio",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Render fictional digital-suspense stories as vertical Instagram Reels using HTML, CSS, a headless browser, and FFmpeg.",
+  "license": "UNLICENSED",
+  "engines": {
+    "node": ">=18"
+  },
+  "bin": {
+    "studio": "src/cli.js"
+  },
+  "scripts": {
+    "doctor": "node src/cli.js doctor",
+    "new": "node src/cli.js new",
+    "gallery": "node src/cli.js gallery",
+    "preview": "node src/cli.js preview",
+    "render": "node src/cli.js render",
+    "verify": "node src/cli.js verify",
+    "build": "node src/cli.js build",
+    "determinism": "node src/cli.js determinism",
+    "clean": "node src/cli.js clean",
+    "test": "node --test \"test/**/*.test.js\""
+  },
+  "dependencies": {
+    "playwright-core": "^1.64.1"
+  },
+  "optionalDependencies": {
+    "@ffmpeg-installer/ffmpeg": "^1.1.0",
+    "@ffprobe-installer/ffprobe": "^2.1.2",
+    "@sparticuz/chromium": "^153.0.0"
+  }
+}

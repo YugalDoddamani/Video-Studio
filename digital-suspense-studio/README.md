@@ -1,73 +1,195 @@
 # Digital Suspense Studio
 
-A Claude Code project for generating fictional phone-screen suspense stories
-as vertical Instagram Reels.
+Turn a one-line topic into a finished vertical video: fictional suspense stories
+told entirely through a phone screen — messages, voicemails, calls, notifications,
+and the room reflected back at you.
 
-## What a video looks like
+Every frame is drawn with HTML/CSS/SVG in a headless browser, then stitched with
+FFmpeg. Rendering is deterministic: the same config always produces the same pixels.
 
-A story unfolds through animated messages, calls, notifications, voice notes,
-and other fictional phone interface elements.
+```
+topic → story.md → scenes.json → frames → final.mp4
+```
 
-The system uses HTML, CSS, and browser rendering to generate frames, then uses
-FFmpeg to stitch those frames into a video.
+---
+
+## Quick start
+
+```bash
+cd digital-suspense-studio
+npm install
+npm run doctor                              # confirm Node, FFmpeg, Chromium
+npm run preview -- voicemail-from-tomorrow  # sampled frames + contact sheet
+npm run build   -- voicemail-from-tomorrow  # render + encode + verify
+```
+
+Output lands in `projects/<slug>/`:
+
+```
+projects/voicemail-from-tomorrow/
+├── scenes.json          # the video, as frames
+├── story.md             # premise, structure, scene breakdown
+├── publishing.md        # caption, hashtags, disclosure, cover idea
+├── render-report.json   # toolchain, timings, every check that ran
+├── preview/
+│   ├── contact-sheet.png
+│   └── frames/
+├── frames/              # 1290 PNGs, regenerable
+└── output/final.mp4
+```
+
+---
 
 ## Requirements
 
-Expected requirements:
+| Tool | Needed for | Notes |
+| --- | --- | --- |
+| **Node.js 18+** | everything | Tested on Node 22 |
+| **FFmpeg + ffprobe** | encoding and verification | Auto-detected, or bundled via npm |
+| **A Chromium build** | drawing frames | Playwright, system Chrome, or npm |
 
-- VS Code
-- Claude Code
-- Node.js and npm
-- FFmpeg and ffprobe available on the command line
-- A browser installed through the chosen browser automation tool
-- Enough disk space for rendered frames
+Nothing else. No cloud services, no API keys, no network access during rendering.
 
-The implementation and exact installation commands will be added here after
-Claude Code builds and tests the pipeline.
+`npm run doctor` reports exactly what it found and where, or how to install what's
+missing. Resolution order for each tool:
 
-## First-time setup
+1. `FFMPEG_PATH`, `FFPROBE_PATH`, `CHROMIUM_PATH` environment variables
+2. A binary on `PATH` (or `/usr/bin`, `/Applications`, …)
+3. The npm-packaged fallback (`@ffmpeg-installer`, `@ffprobe-installer`, `@sparticuz/chromium`)
 
-Open this folder in VS Code, start Claude Code, and type:
+The npm fallbacks are `optionalDependencies`, so a machine that already has FFmpeg
+and Chrome never downloads them.
 
-> Read CLAUDE.md and the docs. Build the first working version of this
-> digital suspense video pipeline. Create a short test story, render it,
-> and verify the output. Update this README with the exact setup and commands.
+### If you have no browser installed
 
-Claude may need permission to install packages or run commands.
+```bash
+npx playwright install chromium     # preferred
+```
 
-## Generate a video from a topic
+On a minimal Linux container with no system libraries, `@sparticuz/chromium`
+works out of the box: the pipeline unpacks its bundled NSS libraries on first use
+and points Chromium at them automatically.
 
-Ask Claude Code:
+---
 
-> Create today's video: A woman receives a voicemail from tomorrow.
+## Commands
 
-Or ask it to select an unused topic:
+| Command | What it does |
+| --- | --- |
+| `npm run doctor` | Environment report: tools, projects, free disk |
+| `npm run list` | Every project with length and render status |
+| `npm run new -- --title "…"` | Scaffold a renderable 3-scene project |
+| `npm run preview -- <slug>` | Sample frames, layout check, contact sheet |
+| `npm run check -- <slug>` | Safe-area / clipping / overflow checks only |
+| `npm run render -- <slug>` | Full pipeline: preview → render → encode → verify |
+| `npm run verify -- <slug>` | Re-probe an existing `final.mp4` |
+| `npm run determinism -- <slug>` | Prove two renders are byte-identical |
+| `npm run gallery` | One frame of every scene type |
+| `npm run clean -- <slug> --frames --yes` | Delete regenerable frames |
+| `npm test` | Unit tests (34, no browser needed) |
 
-> Pick the next unused topic from topics.md and create the video.
+Useful flags: `--frames 0,120,300` or `--frames 0-300:30` to pick exact frames,
+`--crf 16` for higher quality, `--force` to continue past layout errors.
 
-## Outputs
+---
 
-Each video has its own folder in `projects/`, containing:
+## How a video is described
 
-- The written story
-- The scene configuration
-- Preview images, when generated
-- The final MP4
-- A suggested Instagram caption and cover
+A project is one `scenes.json`. Scenes are placed on a frame timeline at **30 fps**;
+intervals are start-inclusive and end-exclusive, so 1290 frames is exactly 43.00s.
+
+```json
+{
+  "title": "Voicemail from Tomorrow",
+  "slug": "voicemail-from-tomorrow",
+  "fictional": true,
+  "fictionLabel": "FICTIONAL STORY",
+  "format": { "width": 1080, "height": 1920, "fps": 30 },
+  "audio": { "mode": "silent", "tracks": [] },
+  "scenes": [
+    {
+      "id": "scene-01-lock",
+      "type": "lock-screen",
+      "startFrame": 0,
+      "durationFrames": 180,
+      "data": {
+        "time": "11:47",
+        "dateLabel": "Thursday, 12 June",
+        "appLabel": "VOICEMAIL",
+        "title": "New voicemail",
+        "body": "From: Me · received tomorrow, 8:14 AM",
+        "highlight": "tomorrow, 8:14 AM"
+      },
+      "events": [
+        { "type": "show-notification", "atFrame": 28, "durationFrames": 10 },
+        { "type": "highlight-timestamp", "atFrame": 52, "durationFrames": 20 }
+      ]
+    }
+  ]
+}
+```
+
+`events[].atFrame` is **scene-local**. Every visual state is a pure function of
+`(config, frame)`, which is what makes the output reproducible.
+
+`npm run check` validates the file before a render: unknown scene types, zero
+durations, duplicate ids, events past the end of a scene, and missing audio files
+all fail loudly with the field name.
+
+### Scene types
+
+| Type | Renders |
+| --- | --- |
+| `lock-screen` | Clock, date, and a notification that should not exist |
+| `notification` | A notification card, optionally with a system alert |
+| `voice-note` | Voicemail player: waveform, timer, word-by-word transcript |
+| `incoming-call` | Caller, pulsing rings, accept / decline |
+| `message-thread` | Chat bubbles and a typing indicator |
+| `system-alert` | In-story warning or confirmation |
+| `street` | Rain on glass, a parked car, headlights igniting |
+| `reflection` | A dark phone screen reflecting a doorway that opens |
+| `end-card` | Final line, accent line, fiction label |
+
+---
+
+## Safety and disclosure
+
+Every scene renders a **FICTIONAL STORY** label, and `publishing.md` repeats the
+disclosure. Names, numbers, and accounts are invented. The pipeline never
+publishes anywhere — you review the draft, then post it yourself.
+
+See `docs/07-quality-and-publishing.md` for the full checklists.
+
+---
 
 ## Audio
 
-Audio is optional in the first version.
+Audio is optional and off by default. A project renders silent unless
+`audio.tracks` lists a local file that exists, in which case it is mixed in as
+AAC. The pipeline never assumes TTS, music, or a cloud service is available, and
+`render-report.json` always records whether the result has audio.
 
-If approved local sound effects or music are available, Claude may use them.
-If not, the system creates a silent video and reports that clearly.
+---
 
-## Fiction disclosure
+## Repository layout
 
-Stories must be clearly labeled as fiction in both the video and caption.
-Do not present fictional messages or events as real evidence.
+```
+digital-suspense-studio/
+├── package.json            npm scripts = the CLI
+├── src/
+│   ├── cli.js              command dispatch
+│   ├── lib/                node side: tooling, server, browser, frames, encode
+│   └── stage/              browser side: motion, timeline, components, scenes, CSS
+├── assets/fonts/           Inter, SIL OFL 1.1, with its licence
+├── projects/               one folder per video
+├── templates/              story + config starting points
+├── docs/                   the design spec, kept in sync with the code
+└── test/                   unit tests
+```
 
-## Important
+The split is deliberate: `src/stage/` is plain browser JavaScript with no build
+step, so a frame can be inspected by opening the stage in any browser. `src/lib/`
+owns everything with side effects — processes, sockets, files.
 
-The documentation defines the system, but the actual renderer must be built
-and tested before video generation works.
+Read `docs/` before changing behaviour. `CLAUDE.md` explains how an agent should
+extend the project.

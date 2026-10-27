@@ -7,21 +7,26 @@ This project creates fictional digital suspense stories for Instagram Reels.
 Stories are told through animated phone interfaces: messages, notifications,
 incoming calls, maps, voice notes, system alerts, and other screen-based visuals.
 
-Read the relevant files in `docs/` before implementing or generating anything.
+The pipeline is built and working. Read the relevant files in `docs/` before
+changing behaviour, and read `README.md` for the commands that actually run.
 
-## First-time setup
+## Current state
 
-If the renderer and scripts do not exist:
+- Renderer: `src/stage/` (browser, no build step) + `src/lib/` (Node).
+- CLI: `src/cli.js`, exposed through npm scripts.
+- Scene types: `lock-screen`, `notification`, `voice-note`, `incoming-call`,
+  `message-thread`, `system-alert`, `street`, `reflection`, `end-card`.
+- A finished example: `projects/voicemail-from-tomorrow/` (43s, silent).
+- Tests: `npm test` (34 unit tests, no browser required).
 
-1. Read all documentation in `docs/`.
-2. Inspect the environment and determine which dependencies are available.
-3. Build the smallest working end-to-end implementation that follows the docs.
-4. Install dependencies only when the environment and user permissions allow it.
-5. Create or update the README with the exact commands that actually work.
-6. Render a short test and verify the output.
-7. Clearly report anything that could not be installed, tested, or rendered.
+Verify before you claim anything works:
 
-Do not claim the pipeline is working until an actual render has been verified.
+```bash
+npm run doctor
+npm test
+npm run check -- <slug>
+npm run render -- <slug>
+```
 
 ## Creating a video
 
@@ -29,18 +34,19 @@ When the user says "create a video", "create today's video", or similar:
 
 1. Use the supplied topic. If none is supplied, select the first unused topic
    in `topics.md`.
-2. Create a unique project folder under `projects/`.
-3. Write an original fictional story based on the topic.
-4. Save the story, scene plan, and machine-readable video configuration.
-5. Create or reuse the necessary components and animations.
-6. Generate a preview if possible.
-7. Render the final video if the dependencies are available.
-8. Perform the checks in `docs/07-quality-and-publishing.md`.
-9. Save a caption, hashtags, and a cover suggestion in the project folder.
-10. Report the output paths, duration, checks performed, and any limitations.
+2. Create a project folder: `npm run new -- --title "..."` (it refuses to
+   overwrite; a taken slug gets a `-2` suffix).
+3. Write an original fictional story based on the topic in `story.md`.
+4. Translate it into `scenes.json` using the existing scene types. Reuse
+   components; only add a new scene type when no combination fits.
+5. Run `npm run preview -- <slug>` and actually look at the contact sheet.
+6. Fix layout warnings, then `npm run render -- <slug>`.
+7. Perform the checks in `docs/07-quality-and-publishing.md`.
+8. Complete `publishing.md`: caption, hashtags, cover suggestion, disclosure.
+9. Report output paths, duration, checks performed, and limitations.
 
-Only mark a topic as completed after the final video has been generated
-and checked. If generation fails, leave it available and explain why.
+Only mark a topic as completed in `topics.md` after the final video has been
+encoded and verified.
 
 ## Creative defaults
 
@@ -74,13 +80,40 @@ and checked. If generation fails, leave it available and explain why.
 - Follow `docs/07-quality-and-publishing.md` for safety and asset rights.
 - Keep implementation simple, documented, and reproducible.
 
+## Where to change what
+
+| Goal | File |
+| --- | --- |
+| Add a scene type | `src/stage/scenes.js`, then register in `SCENES` |
+| Add a UI component | `src/stage/components.js`, style in `src/stage/style.css` |
+| Change palette or type scale | `src/stage/style.css` (`:root` custom properties) |
+| Change timing maths | `src/stage/timeline.js` |
+| Add an easing curve | `src/stage/motion.js` |
+| Change the output format | `src/lib/encode.js` |
+| Add a CLI command | `src/cli.js` |
+| Add a validation rule | `src/lib/config.js` |
+| Change tool discovery | `src/lib/tooling.js` |
+| Teach the docs a new behaviour | `docs/`, then `README.md` |
+
+Keep all visual state a pure function of `(config, frame)`. Do not introduce
+`Date.now()`, `Math.random()`, CSS animations, or network requests into
+`src/stage/` — `npm run determinism -- <slug>` will catch it.
+
+After changing anything in `src/`, run `npm test` and re-render the example to
+confirm frames still look right.
+
 ## Expected project output
 
+```
 projects/<video-slug>/
 ├── story.md
 ├── scenes.json
 ├── publishing.md
-├── preview/             # Optional preview and inspection images
-├── frames/              # Generated frames; may be removed after verification
+├── render-report.json
+├── preview/
+│   ├── contact-sheet.png
+│   └── frames/
+├── frames/              # generated, git-ignored, safe to delete after verification
 └── output/
     └── final.mp4
+```

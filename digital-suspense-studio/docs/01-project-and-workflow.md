@@ -29,6 +29,24 @@ manual work, while preserving an opportunity for human review.
 9. Run the technical and editorial checks.
 10. Save publishing copy and report all output paths.
 
+## Commands that implement the workflow
+
+| Workflow step | Command |
+| --- | --- |
+| Check the environment | `npm run doctor` |
+| 1–2, scaffold a project | `npm run new -- --title "..."` |
+| 3, write the story | edit `projects/<slug>/story.md` |
+| 4–5, build the timeline | edit `projects/<slug>/scenes.json` |
+| 6, preview | `npm run preview -- <slug>` |
+| 7, inspect | open `projects/<slug>/preview/contact-sheet.png` |
+| 8, final render | `npm run render -- <slug>` |
+| 9, checks | run automatically; re-runnable with `npm run verify -- <slug>` |
+| 10, publishing copy | edit `projects/<slug>/publishing.md` |
+
+Steps 6 and 7 are the ones that need human judgement. The tooling reports what
+it can measure (clipping, safe areas, duration, codec); pacing and story quality
+still require a person to look at the frames.
+
 ## Human review
 
 The generated video is a draft until the user reviews it.
