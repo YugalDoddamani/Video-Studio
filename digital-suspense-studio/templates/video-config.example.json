@@ -1,0 +1,53 @@
+{
+  "title": "The Voicemail From Tomorrow",
+  "slug": "the-voicemail-from-tomorrow",
+  "fictional": true,
+  "format": {
+    "width": 1080,
+    "height": 1920,
+    "fps": 30
+  },
+  "audio": {
+    "mode": "silent",
+    "tracks": []
+  },
+  "scenes": [
+    {
+      "id": "scene-01",
+      "type": "notification",
+      "startFrame": 0,
+      "durationFrames": 120,
+      "data": {
+        "appLabel": "VOICEMAIL",
+        "title": "New voicemail",
+        "body": "Received: Tomorrow, 8:14 AM",
+        "fictionLabel": "FICTIONAL STORY"
+      },
+      "events": [
+        {
+          "type": "show-notification",
+          "atFrame": 15,
+          "durationFrames": 10
+        }
+      ]
+    },
+    {
+      "id": "scene-02",
+      "type": "voice-note",
+      "startFrame": 120,
+      "durationFrames": 180,
+      "data": {
+        "sender": "You",
+        "durationLabel": "0:04",
+        "transcript": "Don't answer the next call."
+      },
+      "events": [
+        {
+          "type": "show-transcript",
+          "atFrame": 45,
+          "durationFrames": 12
+        }
+      ]
+    }
+  ]
+}
