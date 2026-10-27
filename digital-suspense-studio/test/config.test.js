@@ -23,11 +23,19 @@ test('a well-formed config passes with no errors', () => {
   assert.ok(config);
 });
 
+test('the gallery renders every registered scene type', () => {
+  const Scenes = require('../src/stage/scenes.js');
+  const types = new Set(galleryConfig().scenes.map((scene) => scene.type));
+  Scenes.sceneTypes().forEach((type) => {
+    assert.ok(types.has(type), `gallery covers "${type}"`);
+  });
+});
+
 test('the component gallery config is valid', () => {
   const { issues, config } = validate(galleryConfig());
   const errors = issues.filter((issue) => issue.severity === 'error');
   assert.deepEqual(errors, []);
-  assert.equal(config.scenes.length, 9);
+  assert.equal(config.scenes.length, 10);
 });
 
 test('every shipped project config is valid', () => {

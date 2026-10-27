@@ -19,9 +19,16 @@ topic → story.md → scenes.json → frames → final.mp4
 cd digital-suspense-studio
 npm install
 npm run doctor                              # confirm Node, FFmpeg, Chromium
-npm run preview -- voicemail-from-tomorrow  # sampled frames + contact sheet
-npm run build   -- voicemail-from-tomorrow  # render + encode + verify
+npm run preview -- dont-open-the-door       # sampled frames + contact sheet
+npm run build   -- dont-open-the-door       # render + encode + verify
 ```
+
+Two finished films ship with the repo:
+
+| Film | Length | About |
+| --- | --- | --- |
+| `voicemail-from-tomorrow` | 43s | A woman gets a voicemail from her own number, dated tomorrow. |
+| `dont-open-the-door` | 45s | A text from her own number arrives with a photo of her, taken from across the room. |
 
 Output lands in `projects/<slug>/`:
 
@@ -132,6 +139,21 @@ intervals are start-inclusive and end-exclusive, so 1290 frames is exactly 43.00
 `events[].atFrame` is **scene-local**. Every visual state is a pure function of
 `(config, frame)`, which is what makes the output reproducible.
 
+A scene can cross-fade in from the one before it:
+
+```json
+"transition": { "type": "fade", "durationFrames": 12 }
+```
+
+Rows in a `message-thread` can be bubbles, time separators, or system rows:
+
+```json
+{ "kind": "separator", "text": "Today 8:41 PM", "atFrame": 18 },
+{ "from": "them", "text": "Don't open the door.", "atFrame": 34 },
+{ "from": "them", "attachment": { "label": "Photo" }, "atFrame": 210 },
+{ "kind": "system", "text": "Missed call · your number", "icon": "call", "atFrame": 128 }
+```
+
 `npm run check` validates the file before a render: unknown scene types, zero
 durations, duplicate ids, events past the end of a scene, and missing audio files
 all fail loudly with the field name.
@@ -144,8 +166,9 @@ all fail loudly with the field name.
 | `notification` | A notification card, optionally with a system alert |
 | `voice-note` | Voicemail player: waveform, timer, word-by-word transcript |
 | `incoming-call` | Caller, pulsing rings, accept / decline |
-| `message-thread` | Chat bubbles and a typing indicator |
+| `message-thread` | Chat bubbles, time separators, system rows, attachments, typing |
 | `system-alert` | In-story warning or confirmation |
+| `photo-viewer` | A photo opened full screen out of a conversation |
 | `street` | Rain on glass, a parked car, headlights igniting |
 | `reflection` | A dark phone screen reflecting a doorway that opens |
 | `end-card` | Final line, accent line, fiction label |

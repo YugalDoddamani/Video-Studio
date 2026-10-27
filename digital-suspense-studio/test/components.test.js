@@ -207,7 +207,7 @@ test('components animate on scene-local frames, not global frames', () => {
   const firstFrame = stateFor(config, scene.startFrame).state;
   const lateFrame = stateFor(config, scene.startFrame + 80).state;
 
-  const visibleBubbles = (html) => (html.match(/class="bubble bubble--in">/g) || []).length;
+  const visibleBubbles = (html) => (html.match(/class="bubble bubble--in\s*"/g) || []).length;
 
   assert.equal(visibleBubbles(Scenes.renderScene(scene, firstFrame)), 0, 'no messages on the scene first frame');
   assert.equal(visibleBubbles(Scenes.renderScene(scene, lateFrame)), 2, 'both messages after their local frames');
@@ -268,4 +268,74 @@ test('transcript lines are hidden before their reveal frame', () => {
 
   assert.ok(early.every((entry) => entry.opacity > 0.9), 'the first line is readable');
   assert.ok(later.every((entry) => entry.opacity === 0), 'the second line has not appeared yet');
+});
+
+test('photo card reveals with a blur that resolves, then holds still', () => {
+  const early = Components.photoCard({ progress: 0, stamp: '8:41 PM', caption: 'x' });
+  const mid = Components.photoCard({ progress: 0.5, stamp: '8:41 PM', caption: 'x' });
+  const done = Components.photoCard({ progress: 1, stamp: '8:41 PM', caption: 'x' });
+
+  const blur = (html) => Number(/filter:blur\(([0-9.]+)px\)/.exec(html)[1]);
+  assert.ok(blur(early) > blur(mid), 'blur decreases as the photo lands');
+  assert.equal(blur(done), 0, 'fully sharp when revealed');
+  assert.match(early, /opacity:0\.000/, 'starts invisible');
+  assert.match(done, /opacity:1\.000/, 'ends fully visible');
+
+  // Deterministic: same props, same markup.
+  assert.equal(
+    Components.photoCard({ progress: 0.5, stamp: '8:41 PM', caption: 'x' }),
+    mid
+  );
+});
+
+test('message thread renders separators, system rows, and attachments', () => {
+  const html = Components.messageThread(
+    {
+      contact: 'Me',
+      messages: [
+        { kind: 'separator', text: 'Today 8:41 PM', atFrame: 0 },
+        { from: 'them', text: 'hi', atFrame: 0 },
+        { kind: 'system', text: 'Missed call', icon: 'call', atFrame: 0 },
+        { from: 'them', attachment: { label: 'Photo' }, atFrame: 0 },
+      ],
+    },
+    { localFrame: 30 }
+  );
+
+  assert.match(html, /thread__sep/);
+  assert.match(html, /Today 8:41 PM/);
+  assert.match(html, /thread__system/);
+  assert.match(html, /Missed call/);
+  assert.match(html, /bubble--media/);
+  assert.match(html, /thumb__wrap/);
+});
+
+test('bubbles spring in without overshooting their opacity', () => {
+  const at0 = Components.bubble({ text: 'x', progress: 0 });
+  const at1 = Components.bubble({ text: 'x', progress: 1 });
+  assert.match(at0, /opacity:0\.000/);
+  assert.match(at1, /opacity:1\.000/);
+
+  // The row's inline opacity must stay within [0, 1] at every point of the
+  // spring. Scale is allowed to overshoot; opacity is not.
+  for (let step = 0; step <= 20; step++) {
+    const html = Components.bubble({ text: 'x', progress: step / 20 });
+    const value = Number(/class="bubble-row[^"]*"\s*style="opacity:([0-9.]+)/.exec(html)[1]);
+    assert.ok(value >= 0 && value <= 1, `opacity ${value} in range at progress ${step / 20}`);
+  }
+});
+
+test('cross-fade transitions are carried through normalisation', () => {
+  const config = Timeline.normalizeConfig({
+    scenes: [
+      { id: 'a', type: 'end-card', durationFrames: 60, data: {}, events: [] },
+      { id: 'b', type: 'end-card', durationFrames: 60, data: {}, events: [], transition: { type: 'fade', durationFrames: 12 } },
+      { id: 'c', type: 'end-card', durationFrames: 60, data: {}, events: [], transition: { type: 'wipe', durationFrames: 12 } },
+      { id: 'd', type: 'end-card', durationFrames: 60, data: {}, events: [], transition: { type: 'fade', durationFrames: 0 } },
+    ],
+  });
+  assert.equal(config.scenes[0].transition, null, 'no transition declared');
+  assert.deepEqual(config.scenes[1].transition, { type: 'fade', durationFrames: 12 });
+  assert.equal(config.scenes[2].transition, null, 'unknown transition types are ignored');
+  assert.equal(config.scenes[3].transition, null, 'zero-length transitions are ignored');
 });

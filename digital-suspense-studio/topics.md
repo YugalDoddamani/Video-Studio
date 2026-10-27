@@ -8,7 +8,7 @@ Add new topics whenever needed.
 ## Ready to generate
 
 - [x] A woman receives a voicemail from tomorrow.
-- [ ] Someone receives a text from their own number: "Don't open the door."
+- [x] Someone receives a text from their own number: "Don't open the door."
 - [ ] A stranger sends a photo taken inside the recipient's locked apartment.
 - [ ] A phone starts receiving messages from a group chat that does not exist.
 - [ ] A lost phone's location moves closer even though it is beside its owner.
@@ -32,6 +32,7 @@ Add new topics whenever needed.
 | Topic | Project folder | Completed |
 | --- | --- | --- |
 | A woman receives a voicemail from tomorrow. | `projects/voicemail-from-tomorrow/` | 2026-10-27 |
+| Someone receives a text from their own number: "Don't open the door." | `projects/dont-open-the-door/` | 2026-10-28 |
 
 Only mark a topic complete once `output/final.mp4` exists and `npm run verify`
 passes for that project.

@@ -114,10 +114,39 @@ A story does not need every scene type.
 
 The code lives in `src/stage/components.js` and `src/stage/scenes.js`.
 
-Components: `StatusBar`, `NotificationCard`, `MessageThread`, `TypingIndicator`,
-`IncomingCall`, `Waveform`, `Transcript`, `VoiceNote`, `SystemAlert`,
-`FictionLabel`, `EndCard`, plus two scene extensions: `RainyStreet` and
+Components: `StatusBar`, `NotificationCard`, `MessageThread`, `Bubble`,
+`ThreadSeparator`, `ThreadSystem`, `TypingIndicator`, `IncomingCall`,
+`Waveform`, `Transcript`, `VoiceNote`, `SystemAlert`, `FictionLabel`,
+`EndCard`, plus three scene extensions: `PhotoCard`, `RainyStreet`, and
 `PhoneReflection`.
+
+### Conversation rows
+
+`messageThread` accepts rows of three kinds, all timed with scene-local
+`atFrame` values:
+
+| `kind` | Renders |
+| --- | --- |
+| *(default)* | A chat bubble; `from: "me"` right-aligns it |
+| `separator` | A centred time marker, e.g. "Today 8:41 PM" |
+| `system` | A centred event chip, e.g. a missed call (`icon: "call"`) |
+
+Bubbles may carry `attachment: { label }` to render a photo preview inline, and
+every row springs in on arrival. Rows collapse upward from the bottom of the
+frame, the way a chat client behaves, and the disclosure chip is a layout row
+beneath them so it can never cover story content.
+
+### Transitions
+
+Any scene may declare a cross-fade into itself:
+
+```json
+"transition": { "type": "fade", "durationFrames": 12 }
+```
+
+The stage holds the previous scene's final frame underneath and fades the new
+scene in over it. Only `fade` is supported; unknown or zero-length transitions
+are ignored during normalisation.
 
 Scene types and the components they compose:
 
@@ -127,7 +156,8 @@ Scene types and the components they compose:
 | `notification` | StatusBar + NotificationCard (+ optional SystemAlert) |
 | `voice-note` | AppHeader + VoiceNote (Waveform + Transcript) |
 | `incoming-call` | IncomingCall |
-| `message-thread` | AppHeader + MessageThread (bubbles + TypingIndicator) |
+| `message-thread` | AppHeader + MessageThread (bubbles, separators, system rows, attachments, TypingIndicator) |
+| `photo-viewer` | AppHeader + PhotoCard (a photo opened full screen from a chat) |
 | `system-alert` | SystemAlert |
 | `street` | RainyStreet |
 | `reflection` | PhoneReflection |

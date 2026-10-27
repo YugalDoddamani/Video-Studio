@@ -178,28 +178,72 @@
   function bubble(props) {
     const progress = clamp01(props.progress === undefined ? 1 : props.progress);
     const outgoing = props.from === 'me' || props.from === 'outgoing';
-    const offset = (1 - progress) * 24;
+    const offset = (1 - progress) * 22;
+    // A whisper of overshoot makes the arrival feel like a message landing
+    // rather than a block fading in. Subtle: 0.965 -> ~1.001.
+    const scale = 0.965 + 0.035 * Motion.ease.outBack(progress);
     const meta = props.meta ? `<span class="bubble__meta">${esc(props.meta)}</span>` : '';
+    // An attachment renders a small preview of the room photo inside the
+    // bubble, so the reveal later in the film lands as a callback.
+    const attachment = props.attachment
+      ? `<span class="bubble__thumb">
+           <span class="thumb__wrap">
+             <span class="thumb__window"></span>
+             <span class="thumb__lamp"></span>
+             <span class="thumb__couch"></span>
+             <span class="thumb__figure"></span>
+             <span class="thumb__glow"></span>
+           </span>
+           <span class="thumb__label">${esc(props.attachment.label || 'Photo')}</span>
+         </span>`
+      : '';
+    const body = props.text ? `<span class="bubble__text">${esc(props.text)}</span>` : '';
     return `
       <div class="bubble-row ${outgoing ? 'bubble-row--out' : 'bubble-row--in'}"
            style="opacity:${progress.toFixed(3)};transform:translateY(${offset.toFixed(1)}px)">
-        <div class="bubble ${outgoing ? 'bubble--out' : 'bubble--in'}">${esc(props.text || '')}</div>
+        <div class="bubble ${outgoing ? 'bubble--out' : 'bubble--in'} ${props.attachment ? 'bubble--media' : ''}"
+             style="transform:scale(${scale.toFixed(4)})">${attachment}${body}</div>
         ${meta}
+      </div>`;
+  }
+
+  /** Centred time marker that separates runs of messages, like a real client. */
+  function threadSeparator(props) {
+    const progress = clamp01(props.progress === undefined ? 1 : props.progress);
+    return `<div class="thread__sep" style="opacity:${progress.toFixed(3)}">${esc(props.text || '')}</div>`;
+  }
+
+  /** Centred one-line event inside a thread: a missed call, a read receipt. */
+  function threadSystem(props, state) {
+    const progress = clamp01(props.progress === undefined ? 1 : props.progress);
+    const icon = props.icon === 'call' ? ICONS.phoneDown : '';
+    return `
+      <div class="thread__system" style="opacity:${progress.toFixed(3)}">
+        ${icon}<span>${esc(props.text || '')}</span>
       </div>`;
   }
 
   function messageThread(props, state) {
     const frame = frameOf(state);
-    const messages = (props.messages || [])
+    const rows = (props.messages || [])
       .filter((message) => frame >= num(message.atFrame, 0))
-      .map((message) =>
-        bubble({
+      .map((message) => {
+        const progress = tween(frame, num(message.atFrame, 0), num(message.arriveFrames, 10));
+
+        if (message.kind === 'separator') {
+          return threadSeparator({ text: message.text, progress });
+        }
+        if (message.kind === 'system') {
+          return threadSystem({ text: message.text, icon: message.icon, progress }, state);
+        }
+        return bubble({
           from: message.from,
           text: message.text,
           meta: message.meta,
-          progress: tween(frame, num(message.atFrame, 0), num(message.arriveFrames, 10)),
-        })
-      )
+          attachment: message.attachment,
+          progress,
+        });
+      })
       .join('');
 
     const typing = (props.typing || []).some(
@@ -210,7 +254,7 @@
 
     return `
       <div class="thread">
-        <div class="thread__msgs">${messages}${typing}</div>
+        <div class="thread__msgs">${rows}${typing}</div>
       </div>`;
   }
 
@@ -364,6 +408,74 @@
         <div class="endcard__rule" style="opacity:${tween(frame, 0, 14).toFixed(3)}"></div>
         ${html}
         ${props.followPrompt ? `<p class="endcard__follow">${esc(props.followPrompt)}</p>` : ''}
+      </div>`;
+  }
+
+  // ---------------------------------------------------------------------------
+  // PhotoCard - a photo sent into a conversation, shown full screen.
+  //
+  // The picture is drawn entirely in CSS: a living room seen from the corner
+  // behind the couch, a figure lit only by the phone in her hands. Nothing is
+  // loaded from disk, so it renders identically everywhere and offline.
+  // ---------------------------------------------------------------------------
+
+  function photoCard(props, state) {
+    const progress = clamp01(props.progress === undefined ? 1 : props.progress);
+    const eased = Motion.ease.outCubic(progress);
+    const blur = (1 - eased) * 16;
+    const scale = 1.05 - 0.05 * eased;
+    // A brief flash as the photo lands, like a camera shutter catching up.
+    const flash = progress < 0.3 ? (1 - progress / 0.3) * 0.22 : 0;
+    const opacity = clamp01(progress * 1.6);
+    const since = props.sinceLabel ? `<span class="photo__since">${esc(props.sinceLabel)}</span>` : '';
+
+    return `
+      <div class="photo">
+        <div class="photo__card"
+             style="opacity:${opacity.toFixed(3)};filter:blur(${blur.toFixed(2)}px);transform:scale(${scale.toFixed(4)})">
+          <div class="photo__room">
+            <div class="photo__wall"></div>
+            <div class="photo__floor"></div>
+            <div class="photo__skirting"></div>
+            <div class="photo__window">
+              <span class="window__pane"></span>
+              <span class="window__blind window__blind--a"></span>
+              <span class="window__blind window__blind--b"></span>
+              <span class="window__blind window__blind--c"></span>
+            </div>
+            <div class="photo__lamp">
+              <span class="lamp__shade"></span>
+              <span class="lamp__stand"></span>
+              <span class="lamp__halo"></span>
+            </div>
+            <div class="photo__couch">
+              <span class="couch__back"></span>
+              <span class="couch__seat"></span>
+              <span class="couch__arm couch__arm--l"></span>
+              <span class="couch__arm couch__arm--r"></span>
+              <span class="couch__cushion couch__cushion--a"></span>
+              <span class="couch__cushion couch__cushion--b"></span>
+            </div>
+            <div class="photo__figure">
+              <span class="figure-side__hair"></span>
+              <span class="figure-side__head"></span>
+              <span class="figure-side__shoulder"></span>
+              <span class="figure-side__back"></span>
+              <span class="figure-side__arm"></span>
+            </div>
+            <div class="photo__glow"></div>
+            <div class="photo__grain"></div>
+            <div class="photo__vig"></div>
+          </div>
+          <div class="photo__flash" style="opacity:${flash.toFixed(3)}"></div>
+          <div class="photo__chrome">
+            <span class="photo__stamp">${esc(props.stamp || '8:41 PM')}</span>
+            ${since}
+          </div>
+        </div>
+        <div class="photo__caption" style="opacity:${clamp01((progress - 0.55) / 0.45).toFixed(3)}">
+          ${esc(props.caption || '')}
+        </div>
       </div>`;
   }
 
@@ -556,6 +668,8 @@
     notificationCard,
     messageThread,
     bubble,
+    threadSeparator,
+    threadSystem,
     typingIndicator,
     incomingCall,
     waveform,
@@ -564,6 +678,7 @@
     systemAlert,
     fictionLabel,
     endCard,
+    photoCard,
     rainyStreet,
     phoneReflection,
     headlightIntensity,

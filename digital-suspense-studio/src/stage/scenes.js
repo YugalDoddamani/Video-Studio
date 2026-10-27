@@ -264,6 +264,41 @@
             messages,
             typing: data.typing || [],
           }, state)}
+          <div class="thread-footer">
+            ${Components.fictionLabel({
+              text: state.config.fictionLabel,
+              opacity: tween(state.localFrame, 10, 14, Motion.ease.outCubic),
+            })}
+          </div>
+        </div>`,
+    });
+  }
+
+  // ---------------------------------------------------------------------------
+  // photo-viewer: a photo opened full screen out of a conversation.
+  // ---------------------------------------------------------------------------
+
+  function renderPhotoViewer(scene, state) {
+    const data = scene.data;
+    const frame = state.localFrame;
+    const revealEvent = eventAt(state.eventsByType, 'photo-received', { atFrame: 30, durationFrames: 26 });
+    const progress = tween(frame, revealEvent.atFrame, revealEvent.durationFrames, Motion.ease.outCubic);
+
+    return screen({
+      statusTime: data.statusTime || '8:41',
+      header: Components.appHeader(
+        data.contact || 'Me',
+        data.headerSubtitle || 'your number',
+        'contact'
+      ),
+      inner: `
+        <div class="screen screen--photo">
+          ${Components.photoCard({
+            progress,
+            stamp: data.stamp || '8:41 PM',
+            sinceLabel: data.sinceLabel || 'sent just now',
+            caption: data.caption || '',
+          }, state)}
           ${fictionFooter(state, { fromFrame: 10 })}
         </div>`,
     });
@@ -350,6 +385,7 @@
     'voice-note': { render: renderVoiceNote, label: 'Voicemail / voice note player' },
     'incoming-call': { render: renderIncomingCall, label: 'Incoming call screen' },
     'message-thread': { render: renderMessageThread, label: 'Message conversation' },
+    'photo-viewer': { render: renderPhotoViewer, label: 'Photo opened from a conversation' },
     'system-alert': { render: renderSystemAlert, label: 'System alert' },
     street: { render: renderStreet, label: 'Rainy street insert' },
     reflection: { render: renderReflection, label: 'Mirror / doorway reveal' },
