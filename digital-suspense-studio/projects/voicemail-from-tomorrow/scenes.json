@@ -1,0 +1,164 @@
+{
+  "title": "Voicemail from Tomorrow",
+  "slug": "voicemail-from-tomorrow",
+  "fictional": true,
+  "fictionLabel": "FICTIONAL STORY",
+  "description": "Late at night, Sarah receives a voicemail from her own number. It is dated tomorrow, and it knows about the blue truck outside.",
+  "format": {
+    "width": 1080,
+    "height": 1920,
+    "fps": 30
+  },
+  "audio": {
+    "mode": "silent",
+    "tracks": []
+  },
+  "scenes": [
+    {
+      "id": "scene-01-lock",
+      "type": "lock-screen",
+      "startFrame": 0,
+      "durationFrames": 180,
+      "data": {
+        "statusTime": "11:47",
+        "time": "11:47",
+        "dateLabel": "Thursday, 12 June",
+        "appLabel": "VOICEMAIL",
+        "title": "New voicemail",
+        "body": "From: Me · received tomorrow, 8:14 AM",
+        "highlight": "tomorrow, 8:14 AM",
+        "when": "now"
+      },
+      "events": [
+        {
+          "type": "show-notification",
+          "atFrame": 28,
+          "durationFrames": 10
+        },
+        {
+          "type": "highlight-timestamp",
+          "atFrame": 52,
+          "durationFrames": 20
+        }
+      ]
+    },
+    {
+      "id": "scene-02-voicemail",
+      "type": "voice-note",
+      "startFrame": 180,
+      "durationFrames": 450,
+      "data": {
+        "statusTime": "11:48",
+        "headerTitle": "VOICEMAIL",
+        "headerSubtitle": "Received tomorrow",
+        "sender": "Me",
+        "subtitle": "Received tomorrow · 8:14 AM",
+        "highlight": "tomorrow",
+        "durationLabel": "0:13",
+        "avatarInitials": "ME",
+        "bars": 56,
+        "waveHeight": 132,
+        "seed": "voicemail-from-tomorrow",
+        "transcriptLabel": "TRANSCRIPT",
+        "transcript": {
+          "revealFrames": 46,
+          "lineStaggerFrames": 130,
+          "lines": [
+            {
+              "text": "Sarah, don't go to the bridge tomorrow at 8:15.",
+              "revealAtFrame": 40
+            },
+            {
+              "text": "The blue truck — it's already here.",
+              "revealAtFrame": 170
+            },
+            {
+              "text": "And whatever you do, don't open the door.",
+              "revealAtFrame": 300
+            }
+          ]
+        }
+      },
+      "events": [
+        {
+          "type": "start-playback",
+          "atFrame": 12,
+          "durationFrames": 430
+        },
+        {
+          "type": "show-transcript",
+          "atFrame": 20,
+          "durationFrames": 12
+        }
+      ]
+    },
+    {
+      "id": "scene-03-street",
+      "type": "street",
+      "startFrame": 630,
+      "durationFrames": 270,
+      "data": {
+        "seed": "blue-truck-rain",
+        "caption": "It wasn't there five minutes ago.",
+        "headlights": {
+          "atFrame": 54,
+          "durationFrames": 22
+        }
+      },
+      "events": [
+        {
+          "type": "headlights-on",
+          "atFrame": 54,
+          "durationFrames": 22
+        }
+      ]
+    },
+    {
+      "id": "scene-04-reflection",
+      "type": "reflection",
+      "startFrame": 900,
+      "durationFrames": 300,
+      "data": {
+        "seed": "reflection-door"
+      },
+      "events": [
+        {
+          "type": "door-open",
+          "atFrame": 36,
+          "durationFrames": 170
+        },
+        {
+          "type": "silhouette",
+          "atFrame": 120,
+          "durationFrames": 140
+        },
+        {
+          "type": "glitch",
+          "atFrame": 140,
+          "durationFrames": 8
+        }
+      ]
+    },
+    {
+      "id": "scene-05-end",
+      "type": "end-card",
+      "startFrame": 1200,
+      "durationFrames": 90,
+      "data": {
+        "lines": [
+          {
+            "text": "The voicemail was from tomorrow.",
+            "atFrame": 0
+          },
+          {
+            "text": "So was the voice behind her.",
+            "atFrame": 14,
+            "accent": true
+          }
+        ],
+        "followPrompt": "New story every night."
+      },
+      "events": []
+    }
+  ]
+}

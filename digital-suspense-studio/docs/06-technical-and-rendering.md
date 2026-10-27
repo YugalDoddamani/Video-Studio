@@ -14,16 +14,34 @@
 These settings are project defaults. Confirm current Instagram requirements
 before publishing.
 
-## Recommended implementation
+## Implemented stack
 
-- Node.js.
-- Playwright with a locally installed Chromium browser.
+- Node.js (18+), no build step.
+- `playwright-core` driving a Chromium build.
 - HTML/CSS/SVG for visuals.
 - FFmpeg for encoding and optional audio mixing.
 - ffprobe for verifying the output.
 
-Claude may choose an equivalent implementation if the environment requires it,
-but must document and test the actual choice.
+Tool discovery is layered so the pipeline works on a laptop and in a bare
+container without configuration:
+
+| Tool | Order |
+| --- | --- |
+| Chromium | `CHROMIUM_PATH` → Playwright browser → system Chrome/Chromium → `@sparticuz/chromium` |
+| FFmpeg | `FFMPEG_PATH` → `PATH` → `@ffmpeg-installer/ffmpeg` |
+| ffprobe | `FFPROBE_PATH` → `PATH` → `@ffprobe-installer/ffprobe` |
+
+`src/lib/tooling.js` owns this. `npm run doctor` prints the resolution for each.
+
+### How the stage is served
+
+The renderer starts a short-lived local HTTP server (ephemeral port, bound to
+127.0.0.1) that serves the stage page, its scripts and bundled fonts, and the
+project's `scenes.json`. The browser loads that page, then is driven one frame
+at a time via `window.__studio.renderFrame(n)` followed by a screenshot. When
+the session closes, the server and browser are torn down.
+
+A render never touches the public internet.
 
 ## Frame model
 
@@ -71,6 +89,16 @@ Example frame naming:
     frame_000002.png
 
 The FFmpeg input frame rate and the frame numbering must match the renderer.
+
+## Layout verification
+
+Because the page is a real DOM, quality checks are measured rather than guessed.
+After rendering a frame the stage reports, per element, whether text leaves the
+safe area, overflows its container, or is clipped. `npm run check` runs this
+across sampled frames and fails the render on errors before any encoding starts.
+
+Glyph bounds are measured rather than block boxes, so centred text that spans
+the full canvas width is not falsely flagged.
 
 ## Preview workflow
 

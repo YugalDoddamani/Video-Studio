@@ -7,7 +7,7 @@ Add new topics whenever needed.
 
 ## Ready to generate
 
-- [ ] A woman receives a voicemail from tomorrow.
+- [x] A woman receives a voicemail from tomorrow.
 - [ ] Someone receives a text from their own number: "Don't open the door."
 - [ ] A stranger sends a photo taken inside the recipient's locked apartment.
 - [ ] A phone starts receiving messages from a group chat that does not exist.
@@ -29,4 +29,9 @@ Add new topics whenever needed.
 
 ## Completed
 
-Move completed topics here with the project folder and completion date.
+| Topic | Project folder | Completed |
+| --- | --- | --- |
+| A woman receives a voicemail from tomorrow. | `projects/voicemail-from-tomorrow/` | 2026-10-27 |
+
+Only mark a topic complete once `output/final.mp4` exists and `npm run verify`
+passes for that project.

@@ -2,6 +2,8 @@
   "title": "The Voicemail From Tomorrow",
   "slug": "the-voicemail-from-tomorrow",
   "fictional": true,
+  "fictionLabel": "FICTIONAL STORY",
+  "description": "A woman receives a voicemail from her own number, dated tomorrow.",
   "format": {
     "width": 1080,
     "height": 1920,
@@ -13,41 +15,67 @@
   },
   "scenes": [
     {
-      "id": "scene-01",
-      "type": "notification",
+      "id": "scene-01-hook",
+      "type": "lock-screen",
       "startFrame": 0,
-      "durationFrames": 120,
+      "durationFrames": 150,
       "data": {
+        "statusTime": "11:47",
+        "time": "11:47",
+        "dateLabel": "Thursday, 12 June",
         "appLabel": "VOICEMAIL",
         "title": "New voicemail",
-        "body": "Received: Tomorrow, 8:14 AM",
-        "fictionLabel": "FICTIONAL STORY"
+        "body": "From: Me · received tomorrow, 8:14 AM",
+        "highlight": "tomorrow, 8:14 AM",
+        "when": "now"
       },
       "events": [
-        {
-          "type": "show-notification",
-          "atFrame": 15,
-          "durationFrames": 10
-        }
+        { "type": "show-notification", "atFrame": 28, "durationFrames": 10 },
+        { "type": "highlight-timestamp", "atFrame": 52, "durationFrames": 20 }
       ]
     },
     {
-      "id": "scene-02",
+      "id": "scene-02-warning",
       "type": "voice-note",
-      "startFrame": 120,
-      "durationFrames": 180,
+      "startFrame": 150,
+      "durationFrames": 300,
       "data": {
-        "sender": "You",
-        "durationLabel": "0:04",
-        "transcript": "Don't answer the next call."
+        "statusTime": "11:48",
+        "headerTitle": "VOICEMAIL",
+        "headerSubtitle": "Received tomorrow",
+        "sender": "Me",
+        "subtitle": "Received tomorrow · 8:14 AM",
+        "highlight": "tomorrow",
+        "durationLabel": "0:13",
+        "avatarInitials": "ME",
+        "bars": 56,
+        "transcript": {
+          "revealFrames": 46,
+          "lineStaggerFrames": 130,
+          "lines": [
+            { "text": "Don't go to the bridge tomorrow.", "revealAtFrame": 40 },
+            { "text": "And don't open the door.", "revealAtFrame": 170 }
+          ]
+        }
       },
       "events": [
-        {
-          "type": "show-transcript",
-          "atFrame": 45,
-          "durationFrames": 12
-        }
+        { "type": "start-playback", "atFrame": 12, "durationFrames": 280 },
+        { "type": "show-transcript", "atFrame": 20, "durationFrames": 12 }
       ]
+    },
+    {
+      "id": "scene-03-ending",
+      "type": "end-card",
+      "startFrame": 450,
+      "durationFrames": 90,
+      "data": {
+        "lines": [
+          { "text": "The voicemail was from tomorrow.", "atFrame": 0 },
+          { "text": "So was the voice behind her.", "atFrame": 14, "accent": true }
+        ],
+        "followPrompt": "New story every night."
+      },
+      "events": []
     }
   ]
 }
