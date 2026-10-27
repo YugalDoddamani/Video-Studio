@@ -1,0 +1,40 @@
+[
+  {
+    "scene": 1,
+    "component": "SplitScreen",
+    "duration": 150,
+    "props": {
+      "character": "Sarah_Anxious",
+      "phone_ui": "Lockscreen_Voicemail",
+      "lighting": "PhoneGlow"
+    }
+  },
+  {
+    "scene": 2,
+    "component": "VoicemailUI",
+    "duration": 450,
+    "props": {
+      "transcript": "Sarah, don't go to the bridge tomorrow at 8:15. The blue truck... it's already here.",
+      "waveform": "active"
+    }
+  },
+  {
+    "scene": 3,
+    "component": "POV_Rainy",
+    "duration": 300,
+    "props": {
+      "background": "BlueTruck_Rain",
+      "overlay": "RainDrops"
+    }
+  },
+  {
+    "scene": 4,
+    "component": "Reflection",
+    "duration": 300,
+    "props": {
+      "character": "Sarah_Reflection",
+      "threat": "Silhouette_Doorway",
+      "animation": "SlowZoom"
+    }
+  }
+]
