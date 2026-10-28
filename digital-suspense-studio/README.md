@@ -233,6 +233,7 @@ digital-suspense-studio/
 │   ├── lib/                node side: tooling, server, browser, frames, encode
 │   └── stage/              browser side: motion, timeline, components, scenes, CSS
 ├── assets/fonts/           Inter, SIL OFL 1.1, with its licence
+├── content/                editorial system: topics, continuity, analytics
 ├── projects/               one folder per video
 ├── templates/              story + config starting points
 ├── docs/                   the design spec, kept in sync with the code

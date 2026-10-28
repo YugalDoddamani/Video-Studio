@@ -37,8 +37,9 @@ npm run render -- <slug>
 
 When the user says "create a video", "create today's video", or similar:
 
-1. Use the supplied topic. If none is supplied, select the first unused topic
-   in `topics.md`.
+1. Use the supplied topic. If none is supplied, open `content/topics.md` and
+   take the highest-scoring topic with status `shortlisted` — not the next
+   unticked line. Record the topic ID in `story.md`.
 2. Create a project folder: `npm run new -- --title "..."` (it refuses to
    overwrite; a taken slug gets a `-2` suffix).
 3. Write an original fictional story based on the topic in `story.md`.
@@ -50,10 +51,15 @@ When the user says "create a video", "create today's video", or similar:
 8. Complete `publishing.md`: caption, hashtags, cover suggestion, disclosure.
 9. Report output paths, duration, checks performed, and limitations.
 
-Only mark a topic as completed in `topics.md` after the final video has been
-encoded and verified. A revision of a shipped film gets its own project folder
-(with a `-30s` / `-v2` suffix) — never overwrite a rendered project, so the old
-cut stays available for comparison.
+Advance a topic through `content/topics.md` one state at a time:
+`scripted → in-production → rendered → reviewed → published`. `rendered` needs an
+encoded, verified `output/final.mp4`. `reviewed` also needs a human listen of any
+audio mix — measurement is not review. `published` needs a confirmed post URL and
+a row in `content/analytics.csv`. Nothing in this repository is published yet.
+
+A revision of a shipped film gets its own project folder (with a `-30s` / `-v2`
+suffix) — never overwrite a rendered project, so the old cut stays available for
+comparison.
 
 ## Revision work
 

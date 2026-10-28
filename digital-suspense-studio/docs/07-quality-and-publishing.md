@@ -82,3 +82,20 @@ Report:
 
 Do not publish to Instagram unless the user explicitly requests it and a
 supported, authorized publishing workflow exists.
+
+## Growth readiness
+
+A film that passes every technical check above is still not ready to post
+until these are true. They do not replace the checks above; they sit in front
+of the act of publishing.
+
+- [ ] Topic ID and pillar are recorded in `content/topics.md`.
+- [ ] Hook type and ending type are recorded.
+- [ ] One primary interaction objective is selected, or intentionally omitted.
+- [ ] A post-publication learning hypothesis is written down before posting.
+- [ ] No performance claim is made before metrics exist.
+
+After posting, add one row to `content/analytics.csv` with the real post URL,
+date and whatever metrics the platform actually reports. Leave unknown fields
+blank. A topic becomes `published` in `content/topics.md` only once a human has
+confirmed the post exists.
