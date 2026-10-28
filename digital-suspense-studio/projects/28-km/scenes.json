@@ -1,0 +1,244 @@
+{
+  "title": "2.8 km",
+  "slug": "28-km",
+  "fictional": true,
+  "fictionLabel": "FICTIONAL STORY",
+  "description": "Her phone is in her hand. Find My shows a second device named Me, 2.8 km away, and it is closing the distance.",
+  "format": {
+    "width": 1080,
+    "height": 1920,
+    "fps": 30
+  },
+  "audio": {
+    "mode": "local",
+    "tracks": [
+      {
+        "file": "audio/mix.wav",
+        "role": "mix",
+        "source": "synthesized score (room tone, seven proximity pings, one notification chime, one dropout) - no voice-over",
+        "note": "assembled by audio/build-audio.sh; every element is generated with FFmpeg signal sources"
+      }
+    ]
+  },
+  "captions": [
+    {
+      "text": "you've got your phone.",
+      "atFrame": 0,
+      "durationFrames": 98
+    },
+    {
+      "text": "it's coming this way.",
+      "atFrame": 98,
+      "durationFrames": 100
+    },
+    {
+      "text": "you haven't moved.",
+      "atFrame": 198,
+      "durationFrames": 90
+    },
+    {
+      "text": "it knows where you are.",
+      "atFrame": 288,
+      "durationFrames": 90
+    },
+    {
+      "text": "inside the building.",
+      "atFrame": 378,
+      "durationFrames": 120
+    },
+    {
+      "text": "three metres.",
+      "atFrame": 498,
+      "durationFrames": 120
+    },
+    {
+      "text": "it has your name.",
+      "atFrame": 618,
+      "durationFrames": 105
+    },
+    {
+      "text": "you're not on it.",
+      "atFrame": 723,
+      "durationFrames": 87
+    }
+  ],
+  "scenes": [
+    {
+      "id": "scene-01-distance",
+      "type": "map",
+      "startFrame": 0,
+      "durationFrames": 390,
+      "events": [],
+      "data": {
+        "statusTime": "9:41",
+        "seed": "28km",
+        "sheetTitle": "Devices",
+        "deviceModel": "iPhone 15 Pro",
+        "selfName": "This iPhone",
+        "selfMeta": "You are here",
+        "labelBefore": "Me",
+        "labelAfter": "Asha",
+        "zoom": [
+          [
+            0,
+            1.0
+          ],
+          [
+            390,
+            1.12
+          ]
+        ],
+        "distance": [
+          [
+            0,
+            2800
+          ],
+          [
+            100,
+            1100
+          ],
+          [
+            200,
+            400
+          ],
+          [
+            390,
+            240
+          ]
+        ],
+        "pinX": [
+          [
+            0,
+            900
+          ],
+          [
+            100,
+            810
+          ],
+          [
+            200,
+            735
+          ],
+          [
+            390,
+            735
+          ]
+        ],
+        "pinY": [
+          [
+            0,
+            600
+          ],
+          [
+            100,
+            645
+          ],
+          [
+            200,
+            685
+          ],
+          [
+            390,
+            685
+          ]
+        ],
+        "banner": {
+          "title": "Me",
+          "body": "Started sharing location",
+          "atFrame": 300,
+          "durationFrames": 12
+        }
+      }
+    },
+    {
+      "id": "scene-02-floor",
+      "type": "map",
+      "startFrame": 390,
+      "durationFrames": 420,
+      "events": [],
+      "data": {
+        "statusTime": "9:41",
+        "seed": "28km",
+        "sheetTitle": "Devices",
+        "deviceModel": "iPhone 15 Pro",
+        "selfName": "This iPhone",
+        "selfMeta": "You are here",
+        "goneName": "No location found",
+        "goneMeta": "Last updated —",
+        "labelBefore": "Me",
+        "labelAfter": "Asha",
+        "labelAtFrame": 240,
+        "selfOutAtFrame": 345,
+        "zoom": [
+          [
+            0,
+            1.12
+          ],
+          [
+            230,
+            1.85
+          ],
+          [
+            420,
+            1.85
+          ]
+        ],
+        "distance": [
+          [
+            0,
+            400
+          ],
+          [
+            120,
+            3
+          ],
+          [
+            420,
+            3
+          ]
+        ],
+        "pinX": [
+          [
+            0,
+            735
+          ],
+          [
+            120,
+            598
+          ],
+          [
+            420,
+            598
+          ]
+        ],
+        "pinY": [
+          [
+            0,
+            685
+          ],
+          [
+            120,
+            700
+          ],
+          [
+            420,
+            700
+          ]
+        ]
+      }
+    },
+    {
+      "id": "scene-03-empty",
+      "type": "map",
+      "startFrame": 810,
+      "durationFrames": 90,
+      "events": [],
+      "data": {
+        "statusTime": "9:41",
+        "empty": true,
+        "emptyTitle": "No devices found",
+        "emptySub": "Last updated —"
+      }
+    }
+  ]
+}
