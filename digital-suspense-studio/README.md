@@ -19,15 +19,16 @@ topic → story.md → scenes.json → frames → final.mp4
 cd digital-suspense-studio
 npm install
 npm run doctor                              # confirm Node, FFmpeg, Chromium
-npm run preview -- voicemail-from-tomorrow-30s   # sampled frames + contact sheet
-npm run build   -- voicemail-from-tomorrow-30s   # render + encode + verify
+npm run preview -- you-answer                    # sampled frames + contact sheet
+npm run build   -- you-answer                    # render + encode + verify
 ```
 
-Two finished films ship with the repo:
+Four finished films ship with the repo:
 
 | Film | Length | About |
 | --- | --- | --- |
-| `voicemail-from-tomorrow-30s` | 30s | **Current cut.** A voicemail from your own voice, dated tomorrow. Sound on. |
+| `you-answer` | 30s | **Part 2, current.** You answer a call from your own number. The camera is outside your door. |
+| `voicemail-from-tomorrow-30s` | 30s | Part 1: a voicemail from your own voice, dated tomorrow. Sound on. |
 | `dont-open-the-door` | 45s | A text from her own number arrives with a photo of her, taken from across the room. |
 | `voicemail-from-tomorrow` | 43s | The first cut of the same story, kept for comparison. Silent. |
 
@@ -184,6 +185,7 @@ rules above, and missing audio files all fail loudly with the field name.
 | `message-thread` | Chat bubbles, time separators, system rows, attachments, typing |
 | `photo-viewer` | A photo opened full screen out of a conversation |
 | `signal-loss` | A dying phone: torn bands, seeded static, hard cut to black |
+| `video-call` | An answered call: a camera pointed at a door, a self-view, the chrome |
 | `system-alert` | In-story warning or confirmation |
 | `street` | Rain on glass, a parked car, headlights igniting |
 | `reflection` | A dark phone screen reflecting a doorway that opens |

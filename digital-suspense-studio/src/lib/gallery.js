@@ -119,6 +119,20 @@ function config() {
       events: [],
     },
     {
+      id: 'gallery-video-call',
+      type: 'video-call',
+      data: {
+        caller: 'Me',
+        callerSubtitle: 'your number',
+        timerStartSeconds: 12,
+        zoom: 0.95,
+        strip: { outAtFrame: 18 },
+        pip: { doorAtFrame: 14, doorFrames: 12 },
+        seed: 'gallery-call',
+      },
+      events: [],
+    },
+    {
       id: 'gallery-alert',
       type: 'system-alert',
       data: {

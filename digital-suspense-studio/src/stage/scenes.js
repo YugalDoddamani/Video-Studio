@@ -435,11 +435,16 @@
     const flash = Math.max(0, 1 - Math.abs(frame - (snowAtFrame + 2)) / 3) * 0.5;
     const pictureOpacity = clamp01(1 - snow * 1.15);
 
-    const picture = `
-      <div class="loss__picture" style="opacity:${pictureOpacity.toFixed(3)};transform:translate(${jitterX.toFixed(1)}px, ${jitterY.toFixed(1)}px)">
-        ${Components.statusBar({ time: data.statusTime || '8:47' })}
-        ${Components.appHeader(data.headerTitle || 'VOICEMAIL', data.headerSubtitle || 'Playing')}
-        <div class="screen screen--player">
+    // What is dying on screen. A voicemail player is the default; a live call is
+    // passed in whole, chrome and self-view included, so the whole frame tears.
+    const callData = data.call || {};
+    const inner = data.picture === 'call'
+      ? Components.callView(
+          Object.assign({}, callData, { timer: callData.timer || Components.timerLabel(callData.timerSeconds) })
+        )
+      : `${Components.statusBar({ time: data.statusTime || '8:47' })}
+         ${Components.appHeader(data.headerTitle || 'VOICEMAIL', data.headerSubtitle || 'Playing')}
+         <div class="screen screen--player">
           ${Components.voiceNote(
             {
               avatarInitials: data.avatarInitials || 'ME',
@@ -458,7 +463,16 @@
             },
             state
           )}
-        </div>
+        </div>`;
+
+    // Once the picture has faded out it is not painted at all: keeping the call
+    // chrome in the layout would only make the frame checker measure text that
+    // nobody can see.
+    const picture = pictureOpacity === 0
+      ? ''
+      : `
+      <div class="loss__picture" style="opacity:${pictureOpacity.toFixed(3)};transform:translate(${jitterX.toFixed(1)}px, ${jitterY.toFixed(1)}px)">
+        ${inner}
       </div>`;
 
     return `
@@ -480,6 +494,58 @@
         </div>
         <div class="vignette"></div>
       </div>`;
+  }
+
+  // ---------------------------------------------------------------------------
+  // video-call: the feed is a door, the self-view is you standing in the room.
+  // ---------------------------------------------------------------------------
+
+  function renderVideoCall(scene, state) {
+    const data = scene.data;
+    const frame = state.localFrame;
+    const duration = Math.max(1, state.durationFrames);
+
+    const zoomFrom = Number(data.zoom) || 1;
+    const zoomTo = data.zoomTo === undefined ? zoomFrom : Number(data.zoomTo);
+    const zoom = zoomFrom + (zoomTo - zoomFrom) * clamp01(frame / duration);
+
+    // A camera in a hand is never still. Two slow sines with different periods
+    // drift without ever repeating inside a scene, and stay deterministic.
+    const drift = {
+      x: Math.sin(frame / 47) * 5,
+      y: Math.sin(frame / 61 + 1.1) * 3.5,
+    };
+
+    const strip = data.strip || {};
+    const stripOutAt = Number(strip.outAtFrame);
+    const stripOpacity = Number.isFinite(stripOutAt) && stripOutAt < 9000
+      ? 1 - tween(frame, stripOutAt, Math.max(1, Number(strip.outFrames) || 3), Motion.ease.outCubic)
+      : 1;
+
+    // When the strip goes out the camera's gain comes up, which is the only
+    // reason anything is still visible on the door for the rest of the scene.
+    const glow = Number.isFinite(stripOutAt) && stripOutAt < 9000
+      ? tween(frame, stripOutAt, 14, Motion.ease.outCubic)
+      : 0;
+
+    const pip = data.pip || {};
+    const pipDoor = tween(frame, Number(pip.doorAtFrame) || 99999, Math.max(1, Number(pip.doorFrames) || 30), Motion.ease.inOutCubic);
+
+    return screen({
+      statusTime: data.statusTime || '9:00',
+      extraClass: 'stage--call',
+      layer: Components.callView({
+        caller: data.caller,
+        callerSubtitle: data.callerSubtitle,
+        timer: Components.timerLabel((Number(data.timerStartSeconds) || 0) + frame / 30),
+        zoom,
+        drift,
+        strip: stripOpacity,
+        glow,
+        pipDoor,
+      }),
+      inner: fictionFooter(state, { fromFrame: 4 }),
+    });
   }
 
   // ---------------------------------------------------------------------------
@@ -561,6 +627,7 @@
     'message-thread': { render: renderMessageThread, label: 'Message conversation' },
     'photo-viewer': { render: renderPhotoViewer, label: 'Photo opened from a conversation' },
     'signal-loss': { render: renderSignalLoss, label: 'Phone dying - torn signal and static' },
+    'video-call': { render: renderVideoCall, label: 'Answered video call - camera feed and self-view' },
     'system-alert': { render: renderSystemAlert, label: 'System alert' },
     street: { render: renderStreet, label: 'Rainy street insert' },
     reflection: { render: renderReflection, label: 'Mirror / doorway reveal' },

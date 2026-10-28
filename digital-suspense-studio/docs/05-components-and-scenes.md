@@ -204,7 +204,8 @@ Scene types and the components they compose:
 | `incoming-call` | IncomingCall |
 | `message-thread` | AppHeader + MessageThread (bubbles, separators, system rows, attachments, TypingIndicator) |
 | `photo-viewer` | AppHeader + PhotoCard (a photo opened full screen from a chat) |
-| `signal-loss` | A dying player: torn bands, seeded snow, scanlines, hard cut to black |
+| `signal-loss` | A dying picture: torn bands, seeded snow, scanlines, hard cut to black |
+| `video-call` | CallView: camera feed of a door, self-view, name/timer, three call buttons |
 | `system-alert` | SystemAlert |
 | `street` | RainyStreet |
 | `reflection` | PhoneReflection |
@@ -228,6 +229,37 @@ The noise is a pure function of `(seed, frame)` — 20 displaced picture bands
 and 170 bright dashes regenerated every frame — so the static never repeats on
 screen but is byte-identical on a re-render. The disclosure chip is layered
 above the snow: the label is a promise, not decoration.
+
+### video-call
+
+A call that has already been answered. The feed is a phone pointed at a door:
+wall, floor, door leaf, two panels, a handle and the strip of light underneath
+it. The self-view is the person holding the phone, and the chrome is a name, a
+timer and three buttons.
+
+```json
+"data": {
+  "caller": "Me", "callerSubtitle": "your number", "timerStartSeconds": 4,
+  "zoom": 0.86, "zoomTo": 1.02,
+  "strip": { "outAtFrame": 9999 },
+  "pip": { "doorAtFrame": 78, "doorFrames": 35 }
+}
+```
+
+- `zoom` / `zoomTo` push the camera in over the scene. The world scales about
+  the floor line (`transform-origin: 50% 1120px`), so pushing in keeps the strip
+  of light where it is — which is how a real camera behaves and what makes the
+  wide-to-close cut read as one continuous shot.
+- `strip.outAtFrame` cuts the light under the door. The moment it goes out the
+  camera gain comes up (`.feed__glow`), which is the only reason the door is
+  still visible afterwards.
+- `pip.doorAtFrame` opens the door in the self-view: the gap widens and lights
+  up behind the silhouette.
+- The camera drifts on two slow sines of the frame number, so it is hand-held
+  but byte-identical on a re-render.
+- `signal-loss` can tear this scene instead of its default player by setting
+  `"picture": "call"` and passing a `call` object — a dying call keeps its
+  chrome and its self-view, which is the point.
 
 ### Adding a scene type
 

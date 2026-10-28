@@ -73,6 +73,18 @@
   // ---------------------------------------------------------------------------
   // StatusBar / chrome
   // ---------------------------------------------------------------------------
+  // Icons that only a connected call needs: a microphone and a camera body.
+  // Drawn here rather than borrowed from ICONS because they are strokes, not
+  // fills, and they sit on tinted glass rather than on the page background.
+  const CALL_ICONS = {
+    mic:
+      '<svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true">' +
+      '<rect x="9" y="2.6" width="6" height="10.6" rx="3"/><path d="M5.6 11.2a6.4 6.4 0 0 0 12.8 0"/><path d="M12 17.6V21"/></svg>',
+    camera:
+      '<svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+      '<rect x="2.6" y="6.4" width="12" height="11.2" rx="2.6"/><path d="M14.6 10.2 21.4 6.6v10.8l-6.8-3.6z"/></svg>',
+  };
+
 
   const ICONS = {
     signal:
@@ -653,6 +665,73 @@
   }
 
   // ---------------------------------------------------------------------------
+  // Scene extension: VideoCall
+  //
+  // A live camera pointed at a door, a self-view in the corner, and the chrome
+  // of a call that has already been answered. Everything is CSS, so the feed
+  // renders identically offline and scales with the zoom the camera does.
+  // ---------------------------------------------------------------------------
+
+  function timerLabel(seconds) {
+    const total = Math.max(0, Math.floor(num(seconds, 0)));
+    const mm = String(Math.floor(total / 60)).padStart(2, '0');
+    const ss = String(total % 60).padStart(2, '0');
+    return `${mm}:${ss}`;
+  }
+
+  function callView(props) {
+    const p = props || {};
+    const zoom = num(p.zoom, 1);
+    const strip = clamp01(p.strip === undefined ? 1 : p.strip);
+    const pipDoor = clamp01(p.pipDoor === undefined ? 0 : p.pipDoor);
+    const drift = p.drift || {};
+    // The door behind you starts shut and nearly invisible: nothing is lit in
+    // that room until it opens.
+    const doorWidth = 2 + pipDoor * 162;
+
+    return `
+      <div class="feed">
+        <div class="feed__world" style="transform:translate(${num(drift.x, 0).toFixed(2)}px, ${num(drift.y, 0).toFixed(2)}px) scale(${zoom.toFixed(4)})">
+          <div class="feed__wall"></div>
+          <div class="feed__floor"></div>
+          <div class="feed__door">
+            <span class="feed__panel feed__panel--top"></span>
+            <span class="feed__panel feed__panel--bottom"></span>
+            <span class="feed__handle"></span>
+            <span class="feed__strip" style="opacity:${strip.toFixed(3)}"></span>
+          </div>
+        </div>
+        <div class="feed__scanlines"></div>
+        <div class="feed__vignette"></div>
+      </div>
+      <div class="feed__glow" style="opacity:${clamp01(p.glow === undefined ? 0 : p.glow).toFixed(3)}"></div>
+      <div class="pip">
+        <div class="pip__wall"></div>
+        <div class="pip__door" style="width:${doorWidth.toFixed(1)}px;opacity:${(0.12 + pipDoor * 0.8).toFixed(3)}"></div>
+        <div class="pip__figure">
+          <span class="figure__hair"></span>
+          <span class="figure__head"></span>
+          <span class="figure__neck"></span>
+          <span class="figure__torso"></span>
+          <span class="figure__arm figure__arm--l"></span>
+          <span class="figure__arm figure__arm--r"></span>
+        </div>
+      </div>
+      <div class="call__top">
+        <span class="call__who">
+          <span class="call__name">${esc(p.caller || 'Me')}</span>
+          <span class="call__sub">${esc(p.callerSubtitle || 'your number')}</span>
+        </span>
+        <span class="call__timer">${esc(p.timer || timerLabel(p.timerSeconds))}</span>
+      </div>
+      <div class="call__actions call__actions--video">
+        <span class="call__action call__action--mute">${CALL_ICONS.mic}</span>
+        <span class="call__action call__action--end">${ICONS.phoneDown}</span>
+        <span class="call__action call__action--flip">${CALL_ICONS.camera}</span>
+      </div>`;
+  }
+
+  // ---------------------------------------------------------------------------
   // Scene extension: PhoneReflection
   // ---------------------------------------------------------------------------
 
@@ -762,6 +841,8 @@
     photoCard,
     rainyStreet,
     phoneReflection,
+    callView,
+    timerLabel,
     headlightIntensity,
   };
 
