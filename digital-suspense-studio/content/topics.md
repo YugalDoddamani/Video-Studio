@@ -3,6 +3,8 @@
 The editorial backlog for the video studio. One record per serious candidate.
 
 **Selection rule:** pick the highest-scoring topic with status `shortlisted`. Do not pick by checkbox order.
+**Voice-over:** every reel is narrated (`docs/02-story-and-writing.md`). A topic that cannot carry a
+first-person spoken line inside the hook window is not eligible, however good the image is.
 **Lifecycle (one state only):** `idea → shortlisted → scripted → in-production → rendered → reviewed → published → measured`
 **Scoring (§4.2):** 1–5 on hook clarity, curiosity, payoff potential, originality, visual readability, participation, production feasibility — weighted 20/20/20/15/10/10/5 to a score out of 100. `80+` shortlist · `65–79` improve the premise · `<65` hold or retire.
 **Nothing in this repository has been published.** No record here has a post URL, a publication date, or a metric. Per §4.4 a topic reaches `published` only when a human confirms the actual post.
@@ -17,7 +19,7 @@ The editorial backlog for the video studio. One record per serious candidate.
 | DS-001 | New Memory | Digital memory | 95 | `shortlisted` | — |
 | DS-003 | 9:00 PM | Time and prediction | 95 | `shortlisted` | — |
 | DS-014 | Two versions of 8:41 | Audience-choice | 95 | `shortlisted` | — |
-| DS-002 | 2.8 km | Location and navigation | 94 | `rendered` | `28-km` |
+| DS-002 | 2.8 km | Location and navigation | 94 | `rendered` | `28-km-60s` (60 s, narrated) · `28-km` (30 s, silent) |
 | DS-004 | You were added to a group | Messages from the impossible | 89 | `shortlisted` | — |
 | DS-005 | Inside the doorbell | Home and personal-space | 88 | `shortlisted` | — |
 | DS-006 | Arrive 9:04 | Location and navigation | 86 | `shortlisted` | — |
@@ -60,10 +62,12 @@ Rendered and technically verified, **not published**. Audio is measured, not aud
 - **Freshness note:** Location engine. No messages, no calls, no door. The antagonist is a dot that only moves on a screen.
 - **Production needs:** **`map` scene type** — built for this film and reused by DS-006 and DS-009. Audio: room tone, seven proximity pings rising in pitch, one notification chime, one dropout, real silence at the end. No voice-over.
 - **Platform packaging idea:** Cover = the map with the two dots 3 m apart; text under six words.
-- **Status:** `rendered` — `projects/28-km`, 900 frames, verify 11/11, deterministic. Audio measured, **not yet auditioned**.
+- **Status:** `rendered` — `projects/28-km-60s`, 1800 frames / 60.00 s, verify 11/11, determinism identical across 30 sampled frames. Narrated by nine takes of one voice; the voice was auditioned before use, but **the finished mix has not been listened to end to end by a human**.
 - **Results:** None. Not published.
 
-**Build notes.** Three scenes, not the four in the brief: the arrival moment became a banner over the map rather than a lock screen, because the phone is in her hand and a lock screen would contradict what the viewer can see. The film has no end card — it closes on the map's own empty state, which is the first time the catalogue has ended without a two-line card. The banner reads `Started sharing location`, not `Arrived at your location`: at 400 m the app would be lying, and the one rule this film cannot break is that the software is always correct.
+**Rebuild (60 s, narrated).** The 30 s cut was a puzzle with nobody in it, so DS-002 was rebuilt rather than patched: same map, same rule, and a woman telling you what it means. Nine voice-over lines (104 words) leave deliberate silences at 16.8–22.0 s and 41.8–46.6 s. Eight scenes, ending on a lock screen that lights itself. **This film runs 60 s while batch 1 is specified at 30 s** — a documented exception: the story needs the room, and the 30 s silent cut stays in the repo as the comparison. It is therefore *not* a clean length experiment: length, narration and structure all change at once.
+
+**Build notes (30 s cut).** Three scenes, not the four in the brief: the arrival moment became a banner over the map rather than a lock screen, because the phone is in her hand and a lock screen would contradict what the viewer can see. The film has no end card — it closes on the map's own empty state, which is the first time the catalogue has ended without a two-line card. The banner reads `Started sharing location`, not `Arrived at your location`: at 400 m the app would be lying, and the one rule this film cannot break is that the software is always correct.
 
 **Score 94** — hook 5 · curiosity 5 · payoff 4 · originality 5 · visual 5 · participation 4 · feasibility 5 → `20+20+16+15+10+8+5`.
 

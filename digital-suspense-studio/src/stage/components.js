@@ -492,7 +492,9 @@
         const leaving = clamp01(remaining / fade);
         const opacity = Math.min(entering, leaving);
         const lift = (1 - Motion.ease.outCubic(entering)) * 16;
-        return `<div class="caption" style="opacity:${opacity.toFixed(3)};transform:translateY(${lift.toFixed(1)}px)">
+        const raise = Number(caption.lift) || 0;
+        const top = raise ? `top:${-raise}px;` : '';
+        return `<div class="caption" style="${top}opacity:${opacity.toFixed(3)};transform:translateY(${lift.toFixed(1)}px)">
           <span class="caption__scrim"></span>
           <p class="caption__text">${captionText(caption.text)}</p>
         </div>`;
@@ -1003,12 +1005,51 @@
         </div>`
         : '';
 
-    const sheetHtml = rows
-      ? `<div class="map__sheet">
-           <span class="map__sheet-head">${esc(p.sheetTitle || 'Devices')}</span>
-           ${rows}
-         </div>`
-      : '';
+    const history = Array.isArray(p.history) ? p.history : [];
+    const historyOpacity = clamp01(num(p.historyOpacity, history.length ? 1 : 0));
+    const frame = num(p.frame, 0);
+    const visibleHistory = history
+      .map((entry, index) => {
+        const atFrame = Number(entry.atFrame);
+        const opacity = Number.isFinite(atFrame)
+          ? tween(frame, atFrame, num(entry.fadeFrames, 10), Motion.ease.outCubic)
+          : 1;
+        return { entry, index, opacity };
+      })
+      .filter((row) => row.opacity > 0.001);
+
+    const historyRows = visibleHistory
+      .map(
+        ({ entry, index, opacity }) => `
+          <div class="map__hist" style="opacity:${opacity.toFixed(3)}">
+            <span class="map__hist-dot"></span>
+            <span class="map__hist-name">${esc(entry.name)}</span>
+            <span class="map__hist-time">${esc(entry.meta || '')}</span>
+          </div>`
+      )
+      .join('');
+
+    const historyHtml =
+      visibleHistory.length && historyOpacity > 0.001
+        ? `<div class="map__history" style="opacity:${historyOpacity.toFixed(3)}">
+             <span class="map__history-head">WHERE IT'S BEEN</span>
+             ${historyRows}
+           </div>`
+        : '';
+
+    // Tapping a device replaces the device list with that device's own history:
+    // the same card, one level deeper, rather than a second card on top of it.
+    const historySheet = p.historySheet === true && visibleHistory.length > 0;
+    const sheetHead = historySheet ? "WHERE IT'S BEEN" : p.sheetTitle || 'Devices';
+    const sheetBody = historySheet ? historyRows : `${rows}${historyHtml}`;
+
+    const sheetHtml =
+      historySheet || rows
+        ? `<div class="map__sheet" style="top:${num(p.sheetTop, 878).toFixed(1)}px">
+             <span class="map__sheet-head">${esc(sheetHead)}</span>
+             ${sheetBody}
+           </div>`
+        : '';
 
     return `
       <div class="map">

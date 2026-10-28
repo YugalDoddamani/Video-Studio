@@ -29,6 +29,14 @@
 - [ ] Frame rate is 30 fps.
 - [ ] Duration matches the scene configuration.
 - [ ] Video uses a compatible H.264/yuv420p encoding.
+### Voice-over (mandatory)
+
+- [ ] The reel has a spoken voice-over. A silent cut does not ship.
+- [ ] The voice-over carries the context the visuals cannot: who, where, what is at stake.
+- [ ] The first spoken line lands inside the hook window (0-4 s) and raises the question.
+- [ ] The voice-over is processed to the house treatment and measured, not guessed.
+- [ ] Captions add a second layer; they never transcribe the voice-over.
+
 - [ ] Audio, if present, is synchronized and audible.
 - [ ] If no audio is present, the user is told.
 - [ ] ffprobe results are recorded or summarized.

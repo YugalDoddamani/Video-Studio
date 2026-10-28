@@ -97,6 +97,10 @@
         durationFrames,
         endFrame: atFrame + durationFrames,
         fadeFrames: positiveInt(source.fadeFrames, 5),
+        // Optional lift, in pixels, out of the default lower-third band. A
+        // scene whose own interface owns that band (a chat thread, a tall map
+        // sheet) raises its card instead of burying it under the UI.
+        lift: Number.isFinite(Number(source.lift)) ? Math.round(Number(source.lift)) : 0,
         _index: index,
       };
     });

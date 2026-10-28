@@ -18,7 +18,8 @@ changing behaviour, and read `README.md` for the commands that actually run.
   `message-thread`, `photo-viewer`, `signal-loss`, `video-call`, `hallway`,
   `recorder`, `map`, `system-alert`, `street`, `reflection`, `end-card`.
 - Project-level caption track: `captions[]`, timed in **global** frames.
-- Audio: silent by default; one mixed track per project, encoded to AAC.
+- Audio: **every reel carries a voice-over.** One mixed track per project
+  (`audio/mix.wav`), encoded to AAC. A silent cut is a bug, not a style.
 - Films: `28-km` (30s, standalone, no voice), `it-was-you` (30s, part 4, the
   finale), `its-inside` (30s, part 3), `you-answer` (30s, part 2),
   `voicemail-from-tomorrow-30s` (30s, part 1), `dont-open-the-door` (45s),
@@ -94,7 +95,10 @@ design), treat the numbers in it as the contract:
 - Animation must be deterministic and driven by frame time.
 - Use local assets. Do not depend on network access during rendering.
 - Never assume an external AI voice or music service is configured.
-- If no approved audio is available, render a silent video and report it.
+- **Voice-over is mandatory on every reel.** The narration carries the context
+  the visuals cannot: who this is, what is at stake, and what the viewer should
+  fear. A cut with no spoken word does not ship. If a voice is genuinely
+  unavailable, stop and report it — do not quietly render a silent film.
 - Never fabricate quality checks or claim to have viewed an output you did not inspect.
 
 ## Working rules

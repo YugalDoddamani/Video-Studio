@@ -1,0 +1,536 @@
+{
+  "title": "2.8 km",
+  "slug": "28-km-60s",
+  "fictional": true,
+  "fictionLabel": "FICTIONAL STORY",
+  "format": {
+    "width": 1080,
+    "height": 1920,
+    "fps": 30
+  },
+  "audio": {
+    "mode": "local",
+    "tracks": [
+      {
+        "file": "audio/mix.wav",
+        "role": "mix",
+        "source": "narration (nine takes) + synthesized score (room tone, seven proximity pings, chime, dropout, wake tick)",
+        "note": "assembled by audio/build-audio.sh from the nine vo-*.mp3 takes in this folder"
+      }
+    ]
+  },
+  "captions": [
+    {
+      "text": "two of me. one phone.",
+      "atFrame": 3,
+      "durationFrames": 100
+    },
+    {
+      "text": "same road. six years.",
+      "atFrame": 172,
+      "durationFrames": 110
+    },
+    {
+      "text": "it has a name.",
+      "atFrame": 366,
+      "durationFrames": 96
+    },
+    {
+      "text": "it knows the route.",
+      "atFrame": 500,
+      "durationFrames": 100
+    },
+    {
+      "text": "everywhere i've been.",
+      "atFrame": 652,
+      "durationFrames": 110
+    },
+    {
+      "text": "the list is my night.",
+      "atFrame": 766,
+      "durationFrames": 120
+    },
+    {
+      "text": "backwards, not behind.",
+      "atFrame": 946,
+      "durationFrames": 90
+    },
+    {
+      "text": "she let someone in.",
+      "atFrame": 1180,
+      "durationFrames": 100,
+      "lift": 700
+    },
+    {
+      "text": "closer than the door.",
+      "atFrame": 1490,
+      "durationFrames": 80
+    },
+    {
+      "text": "it knows my name.",
+      "atFrame": 1572,
+      "durationFrames": 100
+    },
+    {
+      "text": "i didn't touch it.",
+      "atFrame": 1710,
+      "durationFrames": 80
+    }
+  ],
+  "scenes": [
+    {
+      "id": "scene-01-distance",
+      "type": "map",
+      "startFrame": 0,
+      "durationFrames": 150,
+      "data": {
+        "statusTime": "23:41",
+        "seed": "28km",
+        "sheetTitle": "Devices",
+        "deviceModel": "iPhone 15 Pro",
+        "selfName": "This iPhone",
+        "selfMeta": "You are here",
+        "labelBefore": "Me",
+        "labelAfter": "Asha",
+        "zoom": [
+          [
+            0,
+            1.0
+          ],
+          [
+            150,
+            1.04
+          ]
+        ],
+        "distance": [
+          [
+            0,
+            2800
+          ],
+          [
+            150,
+            2680
+          ]
+        ],
+        "pinX": [
+          [
+            0,
+            900
+          ],
+          [
+            150,
+            884
+          ]
+        ],
+        "pinY": [
+          [
+            0,
+            600
+          ],
+          [
+            150,
+            610
+          ]
+        ]
+      },
+      "events": []
+    },
+    {
+      "id": "scene-02-street",
+      "type": "street",
+      "startFrame": 150,
+      "durationFrames": 180,
+      "data": {
+        "seed": "walk-home",
+        "headlights": {
+          "atFrame": 16,
+          "durationFrames": 20
+        }
+      },
+      "events": []
+    },
+    {
+      "id": "scene-03-closing",
+      "type": "map",
+      "startFrame": 330,
+      "durationFrames": 330,
+      "data": {
+        "statusTime": "23:44",
+        "seed": "28km",
+        "sheetTitle": "Devices",
+        "deviceModel": "iPhone 15 Pro",
+        "selfName": "This iPhone",
+        "selfMeta": "You are here",
+        "labelBefore": "Me",
+        "labelAfter": "Asha",
+        "zoom": [
+          [
+            0,
+            1.04
+          ],
+          [
+            330,
+            1.3
+          ]
+        ],
+        "distance": [
+          [
+            0,
+            2680
+          ],
+          [
+            330,
+            1100
+          ]
+        ],
+        "pinX": [
+          [
+            0,
+            884
+          ],
+          [
+            330,
+            700
+          ]
+        ],
+        "pinY": [
+          [
+            0,
+            610
+          ],
+          [
+            330,
+            672
+          ]
+        ]
+      },
+      "events": []
+    },
+    {
+      "id": "scene-04-history",
+      "type": "map",
+      "startFrame": 660,
+      "durationFrames": 390,
+      "data": {
+        "statusTime": "23:47",
+        "seed": "28km",
+        "sheetTitle": "Devices",
+        "deviceModel": "iPhone 15 Pro",
+        "selfName": "This iPhone",
+        "selfMeta": "You are here",
+        "labelBefore": "Me",
+        "labelAfter": "Asha",
+        "zoom": [
+          [
+            0,
+            1.3
+          ],
+          [
+            390,
+            1.45
+          ]
+        ],
+        "distance": [
+          [
+            0,
+            1100
+          ],
+          [
+            390,
+            400
+          ]
+        ],
+        "pinX": [
+          [
+            0,
+            700
+          ],
+          [
+            390,
+            610
+          ]
+        ],
+        "pinY": [
+          [
+            0,
+            672
+          ],
+          [
+            390,
+            700
+          ]
+        ],
+        "sheetTop": [
+          [
+            0,
+            878
+          ],
+          [
+            120,
+            840
+          ],
+          [
+            390,
+            840
+          ]
+        ],
+        "historyOpacity": [
+          [
+            0,
+            0
+          ],
+          [
+            70,
+            1
+          ]
+        ],
+        "history": [
+          {
+            "name": "Hospital",
+            "meta": "23:11",
+            "atFrame": 120
+          },
+          {
+            "name": "Bus stop",
+            "meta": "23:19",
+            "atFrame": 220
+          },
+          {
+            "name": "Ring road",
+            "meta": "now",
+            "atFrame": 320
+          }
+        ],
+        "historySheetAtFrame": 120
+      },
+      "events": []
+    },
+    {
+      "id": "scene-05-sister",
+      "type": "message-thread",
+      "startFrame": 1050,
+      "durationFrames": 390,
+      "data": {
+        "statusTime": "23:52",
+        "contact": "Meera",
+        "headerSubtitle": "mobile",
+        "messages": [
+          {
+            "kind": "separator",
+            "text": "Tonight 23:52",
+            "atFrame": 12
+          },
+          {
+            "from": "me",
+            "text": "meera",
+            "atFrame": 40,
+            "arriveFrames": 10
+          },
+          {
+            "from": "me",
+            "text": "is your door locked",
+            "atFrame": 70,
+            "arriveFrames": 10
+          },
+          {
+            "from": "them",
+            "text": "why",
+            "atFrame": 118,
+            "arriveFrames": 9
+          },
+          {
+            "from": "them",
+            "text": "you're at my door",
+            "atFrame": 146,
+            "arriveFrames": 10
+          },
+          {
+            "from": "them",
+            "text": "i just let you in",
+            "atFrame": 172,
+            "arriveFrames": 10
+          },
+          {
+            "from": "me",
+            "text": "i'm not there",
+            "atFrame": 292,
+            "arriveFrames": 9
+          },
+          {
+            "from": "me",
+            "text": "meera",
+            "atFrame": 330,
+            "arriveFrames": 9
+          }
+        ],
+        "typing": [
+          {
+            "startFrame": 96,
+            "endFrame": 118
+          },
+          {
+            "startFrame": 248,
+            "endFrame": 292
+          },
+          {
+            "startFrame": 348,
+            "endFrame": 390
+          }
+        ]
+      },
+      "events": []
+    },
+    {
+      "id": "scene-06-arrival",
+      "type": "map",
+      "startFrame": 1440,
+      "durationFrames": 240,
+      "data": {
+        "statusTime": "23:58",
+        "seed": "28km",
+        "sheetTitle": "Devices",
+        "deviceModel": "iPhone 15 Pro",
+        "selfName": "This iPhone",
+        "selfMeta": "You are here",
+        "labelBefore": "Me",
+        "labelAfter": "Asha",
+        "zoom": [
+          [
+            0,
+            1.45
+          ],
+          [
+            240,
+            1.85
+          ]
+        ],
+        "distance": [
+          [
+            0,
+            400
+          ],
+          [
+            120,
+            3
+          ],
+          [
+            240,
+            3
+          ]
+        ],
+        "pinX": [
+          [
+            0,
+            610
+          ],
+          [
+            120,
+            560
+          ],
+          [
+            240,
+            560
+          ]
+        ],
+        "pinY": [
+          [
+            0,
+            700
+          ],
+          [
+            120,
+            712
+          ],
+          [
+            240,
+            712
+          ]
+        ],
+        "labelAtFrame": 150,
+        "selfOutAtFrame": 200,
+        "goneName": "No location found",
+        "goneMeta": "Last updated —"
+      },
+      "events": []
+    },
+    {
+      "id": "scene-07-off",
+      "type": "signal-loss",
+      "startFrame": 1680,
+      "durationFrames": 45,
+      "data": {
+        "picture": "map",
+        "map": {
+          "statusTime": "23:58",
+          "seed": "28km",
+          "zoom": [
+            [
+              0,
+              1.85
+            ]
+          ],
+          "distance": [
+            [
+              0,
+              3
+            ]
+          ],
+          "pinX": [
+            [
+              0,
+              560
+            ]
+          ],
+          "pinY": [
+            [
+              0,
+              712
+            ]
+          ],
+          "labelBefore": "Asha",
+          "labelAfter": "Asha",
+          "selfOutAtFrame": -100,
+          "goneName": "No location found",
+          "goneMeta": "Last updated —",
+          "sheetTitle": "Devices",
+          "deviceModel": "iPhone 15 Pro"
+        },
+        "loss": {
+          "atFrame": 4,
+          "tearFrames": 26,
+          "snowAtFrame": 24,
+          "snowFrames": 16,
+          "blackFrames": 6
+        }
+      },
+      "events": []
+    },
+    {
+      "id": "scene-08-relight",
+      "type": "lock-screen",
+      "startFrame": 1725,
+      "durationFrames": 75,
+      "data": {
+        "time": "23:59",
+        "statusTime": "23:59",
+        "dateLabel": "Thursday 12 June",
+        "appLabel": "FIND MY",
+        "title": "Me",
+        "body": "0 m away",
+        "when": "now",
+        "darkRoom": true,
+        "wake": {
+          "atFrame": 12,
+          "durationFrames": 16
+        }
+      },
+      "events": [
+        {
+          "type": "show-notification",
+          "atFrame": 16,
+          "durationFrames": 12
+        }
+      ]
+    }
+  ]
+}
