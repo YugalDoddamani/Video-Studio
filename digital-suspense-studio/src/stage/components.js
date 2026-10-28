@@ -883,7 +883,9 @@
     // against the block they belong to.
     let x = -120;
     while (x < 2320) {
-      const px = x + (next() - 0.5) * 30;
+      // Spacing wanders, and the jitter is bigger than the street is wide, so
+      // no two blocks on screen are the same size.
+      const px = x + (next() - 0.5) * 76;
       if (next() < 0.17) {
         const from = 120 + next() * 1500;
         minor.push(`M${px.toFixed(1)} ${from.toFixed(0)}V${(from + 260 + next() * 900).toFixed(0)}`);
@@ -895,19 +897,19 @@
         const alleyX = px + 30 + next() * 60;
         alleys.push(`M${alleyX.toFixed(1)} ${alleyY.toFixed(0)}h${(40 + next() * 90).toFixed(0)}`);
       }
-      x += 68 + next() * 64;
+      x += 74 + next() * 118;
     }
 
     let y = -120;
     while (y < 2320) {
-      const py = y + (next() - 0.5) * 26;
+      const py = y + (next() - 0.5) * 64;
       if (next() < 0.15) {
         const from = 80 + next() * 1600;
         minor.push(`M${from.toFixed(0)} ${py.toFixed(1)}H${(from + 300 + next() * 800).toFixed(0)}`);
       } else {
         minor.push(`M-140 ${py.toFixed(1)}H2300`);
       }
-      y += 62 + next() * 58;
+      y += 68 + next() * 104;
     }
 
     // Arterials sit on top of the grid at roughly a five-block rhythm.
@@ -917,6 +919,12 @@
       const arterialY = 190 + i * 500 + (next() - 0.5) * 80;
       major.push(`M-140 ${arterialY.toFixed(1)}H2300`);
     }
+
+    // Two diagonals. A grid with a diagonal in it stops reading as graph paper
+    // and starts reading as a city that grew, which is what a map has to be.
+    major.push(`M-160 1980 L 2320 620`);
+    minor.push(`M-160 900 L 1180 -140`);
+    minor.push(`M 760 2320 L 2320 1180`);
 
     const geometry = { minor: minor.join(''), major: major.join(''), alleys: alleys.join('') };
     MAP_CACHE[key] = geometry;
@@ -940,14 +948,61 @@
     const panY = num(p.panY, 0);
     const geo = mapGeometry(p.seed);
 
+    // The zoom is anchored somewhere on the map, and that anchor is the point
+    // that does not move. The first film anchored on her dot; this one anchors
+    // on the flat, because the flat is what the camera goes into.
+    const origin = {
+      x: num((p.origin || {}).x, 540),
+      y: num((p.origin || {}).y, 720),
+    };
+
     const self = p.self || {};
     const other = p.other || {};
     const chip = p.chip || {};
     const banner = p.banner || null;
 
+    // A dot can be given in screen space (it stays put while the map zooms
+    // under it) or in map space (it belongs to the map and rides the zoom).
+    const project = (point, fallbackX, fallbackY) => {
+      if (point && point.map) {
+        return {
+          x: origin.x + (num(point.map.x, origin.x) - origin.x) * zoom + panX,
+          y: origin.y + (num(point.map.y, origin.y) - origin.y) * zoom + panY,
+        };
+      }
+      return { x: num(point && point.x, fallbackX), y: num(point && point.y, fallbackY) };
+    };
+
+    const selfPos = project(self, 540, 720);
+    const otherPos = project(other, 540, 720);
+
     const selfOpacity = clamp01(num(self.opacity, 1));
     const otherOpacity = clamp01(num(other.opacity, 1));
     const accuracy = Math.max(0.5, num(p.accuracy, 1));
+
+    // A house glyph is the one map symbol nobody has to be taught. It sits at
+    // the anchor, so it holds still while the streets rush in around it.
+    const home = p.home || null;
+    const homeOpacity = clamp01(num(home && home.opacity, 1));
+    const homeHtml =
+      home && homeOpacity > 0.001
+        ? `
+        <div class="map__home" style="left:${(origin.x + panX).toFixed(1)}px;top:${(origin.y + panY).toFixed(1)}px;opacity:${homeOpacity.toFixed(3)}">
+          <span class="map__home-glyph">
+            <svg width="38" height="38" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.2 2.4 11.3h2.9v9.5h5.2v-6.2h3v6.2h5.2v-9.5h2.9z" fill="#0c141d"></path></svg>
+          </span>
+          <span class="map__home-label">${esc(home.label || 'Home')}</span>
+        </div>`
+        : '';
+
+    // Zooming into a building is meaningless unless something outlines it.
+    const flat = p.flat || null;
+    const flatOpacity = clamp01(num(flat && flat.opacity, 0));
+    const flatHtml =
+      flat && flatOpacity > 0.001
+        ? `
+        <div class="map__flat" style="left:${(origin.x + panX).toFixed(1)}px;top:${(origin.y + panY).toFixed(1)}px;width:${num(flat.width, 420).toFixed(0)}px;height:${num(flat.height, 380).toFixed(0)}px;opacity:${flatOpacity.toFixed(3)}"></div>`
+        : '';
 
     const rows = (p.rows || [])
       .map((row) => {
@@ -990,8 +1045,8 @@
     const pinHtml =
       other.label && otherOpacity > 0.001
         ? `
-        <div class="map__pin-dot" style="left:${num(other.x, 540).toFixed(1)}px;top:${num(other.y, 720).toFixed(1)}px;opacity:${otherOpacity.toFixed(3)}"></div>
-        <div class="map__pin" style="left:${num(other.x, 540).toFixed(1)}px;top:${num(other.y, 720).toFixed(1)}px;opacity:${otherOpacity.toFixed(3)}">
+        <div class="map__pin-dot" style="left:${otherPos.x.toFixed(1)}px;top:${otherPos.y.toFixed(1)}px;opacity:${otherOpacity.toFixed(3)}"></div>
+        <div class="map__pin" style="left:${otherPos.x.toFixed(1)}px;top:${otherPos.y.toFixed(1)}px;opacity:${otherOpacity.toFixed(3)}">
           <span class="map__pin-chip${other.flash ? ' map__pin-chip--flash' : ''}">${esc(other.label)}</span>
         </div>`
         : '';
@@ -999,8 +1054,8 @@
     const selfHtml =
       selfOpacity > 0.001
         ? `
-        <div class="map__accuracy" style="left:${num(self.x, 540).toFixed(1)}px;top:${num(self.y, 720).toFixed(1)}px;opacity:${(selfOpacity * 0.5).toFixed(3)};transform:translate(-50%,-50%) scale(${accuracy.toFixed(3)})"></div>
-        <div class="map__self" style="left:${num(self.x, 540).toFixed(1)}px;top:${num(self.y, 720).toFixed(1)}px;opacity:${selfOpacity.toFixed(3)}">
+        <div class="map__accuracy" style="left:${selfPos.x.toFixed(1)}px;top:${selfPos.y.toFixed(1)}px;opacity:${(selfOpacity * 0.5).toFixed(3)};transform:translate(-50%,-50%) scale(${accuracy.toFixed(3)})"></div>
+        <div class="map__self" style="left:${selfPos.x.toFixed(1)}px;top:${selfPos.y.toFixed(1)}px;opacity:${selfOpacity.toFixed(3)}">
           <span class="map__self-ring"></span>
         </div>`
         : '';
@@ -1053,22 +1108,21 @@
 
     return `
       <div class="map">
-        <div class="map__layer" style="transform:translate(${panX.toFixed(1)}px, ${panY.toFixed(1)}px) scale(${zoom.toFixed(4)})">
+        <div class="map__layer" style="transform-origin:${origin.x.toFixed(0)}px ${origin.y.toFixed(0)}px;transform:translate(${panX.toFixed(1)}px, ${panY.toFixed(1)}px) scale(${zoom.toFixed(4)})">
           <svg class="map__svg" width="2160" height="2160" viewBox="0 0 2160 2160" aria-hidden="true">
-            <rect x="0" y="0" width="2160" height="2160" fill="#0c141d"></rect>
-            <rect x="330" y="1420" width="470" height="380" rx="46" fill="#0f1c16"></rect>
-            <rect x="1560" y="360" width="380" height="300" rx="38" fill="#0f1c16"></rect>
-            <path d="${geo.minor}" fill="none" stroke="#1b2834" stroke-width="4"></path>
-            <path d="${geo.alleys}" fill="none" stroke="#16212c" stroke-width="3"></path>
-            <path d="${geo.major}" fill="none" stroke="#27394c" stroke-width="12"></path>
-            <path d="M-140 2260L2300 780" fill="none" stroke="#223447" stroke-width="9"></path>
-            <path d="M-160 1520 Q 620 1270 1240 790 T 2320 190" fill="none" stroke="#2c4054" stroke-width="32" stroke-linecap="round"></path>
-            <path d="M-160 2060 Q 520 1740 1080 1810 T 2320 1400" fill="none" stroke="rgba(7,15,23,0.9)" stroke-width="180" stroke-linecap="round"></path>
-            <path d="M-160 2060 Q 520 1740 1080 1810 T 2320 1400" fill="none" stroke="rgba(28,54,74,0.55)" stroke-width="8" stroke-linecap="round"></path>
+            <rect x="0" y="0" width="2160" height="2160" fill="#080e15"></rect>
+            <rect x="268" y="1312" width="540" height="430" rx="58" fill="#0b1712"></rect>
+            <rect x="1508" y="296" width="430" height="352" rx="46" fill="#0b1712"></rect>
+            <path d="${geo.minor}" fill="none" stroke="#16222e" stroke-width="3"></path>
+            <path d="${geo.alleys}" fill="none" stroke="#111a24" stroke-width="2"></path>
+            <path d="${geo.major}" fill="none" stroke="#1e2f40" stroke-width="8"></path>
+            <path d="M-160 1520 Q 620 1270 1240 790 T 2320 190" fill="none" stroke="#2a3d50" stroke-width="26" stroke-linecap="round"></path>
+            <path d="M-160 2060 Q 520 1740 1080 1810 T 2320 1400" fill="none" stroke="#060b12" stroke-width="196" stroke-linecap="round"></path>
+            <path d="M-160 2060 Q 520 1740 1080 1810 T 2320 1400" fill="none" stroke="#16242f" stroke-width="3" stroke-linecap="round"></path>
           </svg>
         </div>
         <div class="map__shade"></div>
-        ${selfHtml}${pinHtml}${chipHtml}${bannerHtml}
+        ${flatHtml}${homeHtml}${selfHtml}${pinHtml}${chipHtml}${bannerHtml}
         ${sheetHtml}
       </div>`;
   }

@@ -88,7 +88,7 @@
   /** 2800 metres reads as "2.8 km"; 3 metres reads as "3 m". */
   function formatDistance(metres) {
     if (metres >= 995) return { value: (metres / 1000).toFixed(1), unit: 'km' };
-    return { value: String(Math.max(1, Math.round(metres))), unit: 'm' };
+    return { value: String(Math.max(0, Math.round(metres))), unit: 'm' };
   }
 
   // ---------------------------------------------------------------------------
@@ -637,6 +637,25 @@
         }
       : null;
 
+    // A camera feed without its own chrome is just a corridor. The channel
+    // name, the live dot and the running clock are what tell the viewer they
+    // are looking at a recording, not standing in the room.
+    const feed = data.feed;
+    const feedClock = (() => {
+      if (!feed) return '';
+      const total = (Number(feed.startSeconds) || 0) + frame / 30;
+      const secs = Math.floor(total % 60);
+      const mins = Math.floor(total / 60) % 60;
+      const hours = Math.floor(total / 3600) % 24;
+      return [hours, mins, secs].map((n) => String(n).padStart(2, '0')).join(':');
+    })();
+    const feedHtml = feed
+      ? `<div class="feedbar">
+           <span class="feedbar__left"><i class="feedbar__live"></i>${Components.esc(feed.label || 'CAM 02')}</span>
+           <span class="feedbar__right">${feedClock}</span>
+         </div>`
+      : '';
+
     return screen({
       statusTime: data.statusTime || '9:02',
       extraClass: 'stage--call',
@@ -652,7 +671,7 @@
         phoneGlow: mix(data.phoneGlow === undefined ? 0.85 : data.phoneGlow, data.phoneGlowTo),
         chrome,
       }),
-      inner: fictionFooter(state, { fromFrame: 4 }),
+      inner: `${feedHtml}${fictionFooter(state, { fromFrame: 4 })}`,
     });
   }
 
@@ -716,6 +735,22 @@
   function mapInnerHtml(data, state) {
     const frame = state.localFrame;
 
+    // A dot can be pinned to the screen or to the map. Screen-space is what
+    // the first film needed (she never moves, the city does); map-space is what
+    // a camera move needs, because the dot has to go with the streets.
+    const mapPoint = (keys) => {
+      if (!keys) return null;
+      if (Array.isArray(keys)) {
+        return {
+          map: {
+            x: keyframes(frame, keys.map((k) => [k[0], k[1]])),
+            y: keyframes(frame, keys.map((k) => [k[0], k[2]])),
+          },
+        };
+      }
+      return { map: { x: Number(keys.x), y: Number(keys.y) } };
+    };
+
     if (data.empty) {
       return `
           ${Components.statusBar({ time: data.statusTime })}
@@ -753,7 +788,9 @@
         }
       : null;
 
-    const rows = [
+    // The device sheet is a card that covers the bottom third of the map, so a
+    // scene that needs the whole map can switch it off and let the pins speak.
+    const rows = data.sheet === false ? [] : [
       {
         name: flipped ? data.labelAfter : data.labelBefore,
         meta: data.deviceModel || 'iPhone 15 Pro',
@@ -761,7 +798,14 @@
       },
       gone
         ? { name: data.goneName || 'No location found', meta: data.goneMeta || 'Last updated \u2014', tone: 'muted' }
-        : { name: data.selfName || 'This iPhone', meta: data.selfMeta || 'You are here', dist: 'now' },
+        : {
+            name: data.selfName || 'This iPhone',
+            meta: data.selfMeta || 'You are here',
+            // The first film only ever needed "now" here. This one needs the
+            // row to agree with the chip, because the whole ending is the two
+            // rows printing the same number.
+            dist: data.selfDist === 'distance' ? distanceText : data.selfDist || 'now',
+          },
     ];
 
     // A sheet can also *grow*: `sheetTop` accepts a keyframe list so the card
@@ -790,9 +834,25 @@
             zoom,
             panX: Number(data.panX) || 0,
             panY: Number(data.panY) || 0,
+            origin: data.origin,
+            home: data.home
+              ? { label: data.home.label, opacity: data.homeOpacity === undefined ? 1 : data.homeOpacity }
+              : null,
+            flat: data.flat
+              ? {
+                  width: data.flat.width,
+                  height: data.flat.height,
+                  opacity: Array.isArray(data.flat.opacity)
+                    ? keyframes(frame, data.flat.opacity)
+                    : Number(data.flat.opacity) || 0,
+                }
+              : null,
             accuracy: 1 + (1 - clamp01(metres / 2800)) * 0.4,
-            self: { x: 540, y: 720, opacity: selfOpacity },
-            other: { x: pinX, y: pinY, label: flipped ? data.labelAfter : data.labelBefore, flash },
+            self: Object.assign({ opacity: selfOpacity }, mapPoint(data.selfMap) || { x: 540, y: 720 }),
+            other: Object.assign(
+              { label: flipped ? data.labelAfter : data.labelBefore, flash },
+              mapPoint(data.pinMap) || { x: pinX, y: pinY }
+            ),
             chip: { value: distance.value, unit: distance.unit },
             banner,
             rows,
