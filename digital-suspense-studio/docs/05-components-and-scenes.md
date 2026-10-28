@@ -206,6 +206,8 @@ Scene types and the components they compose:
 | `photo-viewer` | AppHeader + PhotoCard (a photo opened full screen from a chat) |
 | `signal-loss` | A dying picture: torn bands, seeded snow, scanlines, hard cut to black |
 | `video-call` | CallView: camera feed of a door, self-view, name/timer, three call buttons |
+| `hallway` | HallView: a CSS corridor with a lit doorway, a figure and a lens cover |
+| `recorder` | Recorder: the screen that is leaving the message, timer + level meter |
 | `system-alert` | SystemAlert |
 | `street` | RainyStreet |
 | `reflection` | PhoneReflection |
@@ -260,6 +262,47 @@ timer and three buttons.
 - `signal-loss` can tear this scene instead of its default player by setting
   `"picture": "call"` and passing a `call` object — a dying call keeps its
   chrome and its self-view, which is the point.
+
+### hallway
+
+The same call chrome as `video-call`, but the feed is inside the house: a
+corridor seen straight on, a lit doorway at the far end, and someone standing in
+it with a phone at their ear.
+
+```json
+"data": {
+  "zoom": 1, "zoomTo": 1.55, "originY": 1200,
+  "doorOpen": 0.55, "lamp": 0.8, "phoneGlow": 0.9,
+  "figure": { "scale": 0.5, "scaleTo": 2.6, "y": 0, "yTo": 520, "blur": 0, "blurTo": 7 },
+  "cover": { "atFrame": 56, "frames": 26 },
+  "call": { "caller": "You", "callerSubtitle": "your number", "timerStartSeconds": 31 }
+}
+```
+
+- The corridor is four `clip-path` polygons meeting at the same four corners, so
+  the walls converge without a transform. Camera push-in scales the world about
+  `originY` (the floor line), which is why the doorway stays planted.
+- `figure.scale` / `scaleTo` and `y` / `yTo` walk the person towards the lens;
+  `blur` / `blurTo` is the phone failing to focus as they arrive. Without the
+  blur a flat silhouette reads as a diagram once it fills half the frame.
+- `cover.atFrame` closes a palm over the lens. The picture goes before the sound
+  does — put the loudest hit in the mix on that frame.
+- `tilt` (degrees) rotates the whole feed for a phone lying on a floor. The
+  component scales the feed by `1 + |tilt|/90 * 1.02` so the rotation never
+  exposes the stage behind it at the corners.
+- `call` is optional: leave it out and you have a camera, not a call.
+
+### recorder
+
+The other half of the voicemail — the screen you would be looking at while the
+message that arrives tomorrow is being left today.
+
+```json
+"data": { "statusTime": "9:05", "label": "NEW VOICEMAIL", "to": "to: Me", "startSeconds": 0 }
+```
+
+The timer counts in tenths, the 56 bars are seeded per project and modulated by
+the frame number, so the meter moves but a re-render is byte-identical.
 
 ### Adding a scene type
 

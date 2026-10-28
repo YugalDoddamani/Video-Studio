@@ -34,6 +34,8 @@ Add new topics whenever needed.
 | A woman receives a voicemail from tomorrow. | `projects/voicemail-from-tomorrow/` | 2026-10-27 |
 | A woman receives a voicemail from tomorrow. *(30s revision, with sound)* | `projects/voicemail-from-tomorrow-30s/` | 2026-10-28 |
 | A woman receives a voicemail from tomorrow. *(part 2 — "You Answer")* | `projects/you-answer/` | 2026-10-28 |
+| A woman receives a voicemail from tomorrow. *(part 3 — "It's Inside")* | `projects/its-inside/` | 2026-10-28 |
+| A woman receives a voicemail from tomorrow. *(part 4 — "It Was You", the finale)* | `projects/it-was-you/` | 2026-10-28 |
 | Someone receives a text from their own number: "Don't open the door." | `projects/dont-open-the-door/` | 2026-10-28 |
 
 Only mark a topic complete once `output/final.mp4` exists and `npm run verify`

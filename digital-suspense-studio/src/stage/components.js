@@ -732,6 +732,123 @@
   }
 
   // ---------------------------------------------------------------------------
+  // Scene extension: HallView
+  //
+  // The same call chrome as callView, but the feed is the inside of a house: a
+  // corridor seen straight on, a doorway at the far end, and someone standing
+  // in it with a phone at their ear. Every shape is placed on the perspective
+  // lines of the corridor, so the whole thing is flat CSS — no image, no
+  // build step, and a re-render is byte-identical.
+  //
+  // props.cover swallows the frame from the bottom: a palm over the lens.
+  // ---------------------------------------------------------------------------
+
+  function hallView(props) {
+    const p = props || {};
+    const zoom = num(p.zoom, 1);
+    const originY = num(p.originY, 1200);
+    const drift = p.drift || {};
+    const figure = p.figure || {};
+    const figureScale = num(figure.scale, 1);
+    const figureY = num(figure.y, 0);
+    const figureOpacity = clamp01(figure.opacity === undefined ? 1 : figure.opacity);
+    const cover = clamp01(p.cover === undefined ? 0 : p.cover);
+    const doorOpen = clamp01(p.doorOpen === undefined ? 0.4 : p.doorOpen);
+    const lamp = clamp01(p.lamp === undefined ? 0.75 : p.lamp);
+    const phoneGlow = clamp01(p.phoneGlow === undefined ? 0.8 : p.phoneGlow);
+    const tilt = num(p.tilt, 0);
+
+    const chrome = p.chrome
+      ? `
+      <div class="call__top">
+        <span class="call__who">
+          <span class="call__name">${esc(p.chrome.caller || 'You')}</span>
+          <span class="call__sub">${esc(p.chrome.callerSubtitle || 'your number')}</span>
+        </span>
+        <span class="call__timer">${esc(p.chrome.timer || '')}</span>
+      </div>
+      <div class="call__actions call__actions--video">
+        <span class="call__action call__action--mute">${CALL_ICONS.mic}</span>
+        <span class="call__action call__action--end">${ICONS.phoneDown}</span>
+        <span class="call__action call__action--flip">${CALL_ICONS.camera}</span>
+      </div>`
+      : '';
+
+    return `
+      <div class="hall" style="transform:rotate(${tilt.toFixed(2)}deg) scale(${(1 + Math.abs(tilt) / 90 * 1.02).toFixed(4)})">
+        <div class="hall__world" style="transform-origin:50% ${originY.toFixed(0)}px;transform:translate(${num(drift.x, 0).toFixed(2)}px, ${num(drift.y, 0).toFixed(2)}px) scale(${zoom.toFixed(4)})">
+          <div class="hall__ceiling"></div>
+          <div class="hall__floor"></div>
+          <div class="hall__wall hall__wall--l"></div>
+          <div class="hall__wall hall__wall--r"></div>
+          <div class="hall__far">
+            <span class="hall__out" style="opacity:${(doorOpen * 0.75).toFixed(3)}"></span>
+            <span class="hall__front" style="left:${(26 - doorOpen * 78).toFixed(0)}px;width:${(148 - doorOpen * 46).toFixed(0)}px"></span>
+            <span class="hall__seam" style="opacity:${(0.18 + doorOpen * 0.7).toFixed(3)};left:${(172 - doorOpen * 52).toFixed(0)}px"></span>
+          </div>
+          <div class="hall__side hall__side--l"></div>
+          <div class="hall__side hall__side--r"></div>
+          <div class="hall__lamp" style="opacity:${lamp.toFixed(3)}"></div>
+          <div class="hall__pool" style="opacity:${(0.2 + lamp * 0.8).toFixed(3)}"></div>
+          <div class="hall__figure" style="opacity:${figureOpacity.toFixed(3)};filter:blur(${num(figure.blur, 0).toFixed(2)}px);transform:translate(-50%, ${figureY.toFixed(1)}px) scale(${figureScale.toFixed(4)})">
+            <span class="hf__hair"></span>
+            <span class="hf__head"></span>
+            <span class="hf__neck"></span>
+            <span class="hf__torso"></span>
+            <span class="hf__leg hf__leg--l"></span>
+            <span class="hf__leg hf__leg--r"></span>
+            <span class="hf__arm hf__arm--l"></span>
+            <span class="hf__arm hf__arm--r"></span>
+            <span class="hf__phone" style="opacity:${phoneGlow.toFixed(3)}"></span>
+          </div>
+        </div>
+        <div class="hall__cover" style="opacity:${cover.toFixed(3)};transform:scale(${(1 + cover * 0.45).toFixed(3)})"></div>
+        <div class="feed__scanlines"></div>
+        <div class="feed__vignette"></div>
+      </div>
+      ${chrome}`;
+  }
+
+  // ---------------------------------------------------------------------------
+  // Recorder
+  //
+  // The other half of the voicemail: the screen you would be looking at while
+  // the message that arrives tomorrow is being left today. The bars are seeded
+  // per project and then modulated by the frame number, so they move like a
+  // level meter but a re-render is byte-identical.
+  // ---------------------------------------------------------------------------
+
+  function recorder(props, state) {
+    const p = props || {};
+    const frame = state ? state.localFrame : 0;
+    const total = Math.max(0, Number(p.seconds) || 0);
+    const minutes = Math.floor(total / 60);
+    const seconds = total - minutes * 60;
+    const stamp = `${String(minutes).padStart(2, '0')}:${seconds.toFixed(1).padStart(4, '0')}`;
+
+    const random = Motion.mulberry32(Motion.hashString(p.seed || 'recorder'));
+    const bars = [];
+    for (let i = 0; i < 56; i += 1) {
+      const base = 0.18 + random() * 0.8;
+      const wobble = 0.5 + 0.5 * Math.sin(frame / 6.5 + i * 0.85);
+      const height = Math.max(0.07, base * (0.35 + 0.65 * wobble));
+      bars.push(`<span class="rec__bar" style="height:${(height * 100).toFixed(1)}%"></span>`);
+    }
+
+    return `
+      <div class="rec">
+        <div class="rec__head">
+          <span class="rec__dot"></span>
+          <span class="rec__label">${esc(p.label || 'NEW VOICEMAIL')}</span>
+          <span class="rec__to">${esc(p.to || 'to: Me')}</span>
+        </div>
+        <div class="rec__timer">${stamp}</div>
+        <div class="rec__wave">${bars.join('')}</div>
+        <div class="rec__hint">tap to stop</div>
+      </div>`;
+  }
+
+  // ---------------------------------------------------------------------------
   // Scene extension: PhoneReflection
   // ---------------------------------------------------------------------------
 
@@ -842,6 +959,8 @@
     rainyStreet,
     phoneReflection,
     callView,
+    hallView,
+    recorder,
     timerLabel,
     headlightIntensity,
   };

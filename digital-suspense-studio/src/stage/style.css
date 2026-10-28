@@ -2506,3 +2506,348 @@ body {
 .stage--call .fiction-wrap {
   z-index: 9;
 }
+
+/* ===========================================================================
+   Part 3/4 — the hallway feed (Components.hallView)
+
+   A corridor seen straight on: the four planes are polygons clipped onto the
+   perspective lines that meet at (540, 936) and the far wall sits on those same
+   corners, so the walls converge without a single transform. The far end is
+   lit and the near end is not, which is the whole reason the shape reads.
+   =========================================================================== */
+
+.hall {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: #07090d;
+}
+
+.hall__world {
+  position: absolute;
+  inset: 0;
+  transform-origin: 50% 1200px;
+}
+
+.hall__ceiling,
+.hall__floor,
+.hall__wall,
+.hall__far,
+.hall__side,
+.hall__lamp,
+.hall__pool,
+.hall__figure,
+.hall__cover {
+  position: absolute;
+}
+
+/* Far plane, and the four planes that converge on it. */
+.hall__ceiling {
+  inset: 0;
+  clip-path: polygon(0 0, 1080px 0, 708px 672px, 372px 672px);
+  background: linear-gradient(180deg, #090d13 0px, #141c27 380px, #232d3a 672px);
+}
+
+.hall__floor {
+  inset: 0;
+  clip-path: polygon(0 1920px, 1080px 1920px, 708px 1200px, 372px 1200px);
+  background:
+    radial-gradient(38% 24% at 50% 14%, rgba(246, 231, 191, 0.26), rgba(246, 231, 191, 0) 74%),
+    linear-gradient(180deg, #2c3644 1200px, #161d27 1560px, #080b11 1920px);
+}
+
+.hall__wall {
+  inset: 0;
+}
+.hall__wall--l {
+  clip-path: polygon(0 0, 372px 672px, 372px 1200px, 0 1920px);
+  background: linear-gradient(90deg, #080b11 0px, #18202b 190px, #33404f 372px);
+}
+.hall__wall--r {
+  clip-path: polygon(1080px 0, 708px 672px, 708px 1200px, 1080px 1920px);
+  background: linear-gradient(270deg, #080b11 0px, #18202b 190px, #33404f 372px);
+}
+
+.hall__far {
+  left: 372px;
+  top: 672px;
+  width: 336px;
+  height: 528px;
+  background:
+    radial-gradient(80% 60% at 50% 44%, rgba(246, 231, 191, 0.16), rgba(246, 231, 191, 0) 74%),
+    linear-gradient(180deg, #2e3949 0%, #222b37 58%, #141b24 100%);
+  box-shadow: inset 0 0 110px rgba(0, 0, 0, 0.55);
+}
+
+/* What is on the other side of the door: the hallway light from part 2,
+   arriving the other way. It only exists once the door is open. */
+.hall__out {
+  position: absolute;
+  left: 22px;
+  top: 70px;
+  width: 168px;
+  height: 462px;
+  background: linear-gradient(180deg, #d9cbaa 0%, #b3a687 44%, #6f6650 100%);
+  box-shadow: 0 0 70px rgba(248, 236, 202, 0.32);
+}
+
+/* The front door, seen from inside: it stands ajar, and the light coming
+   through the gap is the hallway light from part 2, arriving the other way. */
+.hall__front {
+  position: absolute;
+  left: 26px;
+  top: 74px;
+  width: 148px;
+  height: 454px;
+  background: linear-gradient(180deg, #131a23 0%, #0d131a 68%, #080c11 100%);
+  box-shadow: inset 0 0 44px rgba(0, 0, 0, 0.75), 6px 0 40px rgba(0, 0, 0, 0.6);
+}
+
+.hall__seam {
+  position: absolute;
+  left: 172px;
+  top: 74px;
+  width: 26px;
+  height: 454px;
+  background: linear-gradient(90deg, rgba(248, 236, 202, 0.88), rgba(248, 236, 202, 0.04));
+  filter: blur(1px);
+}
+
+/* Doors on the side walls: quads on the corridor's own perspective lines. */
+.hall__side {
+  background: linear-gradient(180deg, rgba(6, 9, 14, 0.92), rgba(2, 4, 7, 0.96));
+  box-shadow: inset 0 0 90px rgba(0, 0, 0, 0.7);
+}
+.hall__side--l {
+  clip-path: polygon(90px 780px, 300px 854px, 300px 1224px, 90px 1520px);
+}
+.hall__side--r {
+  clip-path: polygon(990px 780px, 780px 854px, 780px 1224px, 990px 1520px);
+}
+
+.hall__lamp {
+  left: 50%;
+  top: 258px;
+  width: 300px;
+  height: 300px;
+  margin-left: -150px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(246, 231, 191, 0.42) 0%, rgba(246, 231, 191, 0.14) 40%, rgba(246, 231, 191, 0) 70%);
+}
+
+.hall__lamp::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 116px;
+  width: 30px;
+  height: 40px;
+  margin-left: -15px;
+  border-radius: 46% 46% 30% 30%;
+  background: linear-gradient(180deg, #fdf3d8, #c9b184);
+  box-shadow: 0 0 60px rgba(246, 231, 191, 0.7);
+}
+
+.hall__pool {
+  left: 50%;
+  top: 900px;
+  width: 700px;
+  height: 340px;
+  margin-left: -350px;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(246, 231, 191, 0.16), rgba(246, 231, 191, 0) 76%);
+}
+
+/* The person at the end of the corridor. 700 px at scale 1; the feet sit on
+   1200 px, so scaling about the bottom edge is scaling about the floor. */
+.hall__figure {
+  left: 50%;
+  top: 500px;
+  width: 240px;
+  height: 700px;
+  transform-origin: 50% 100%;
+}
+
+.hall__figure span {
+  position: absolute;
+  display: block;
+}
+
+.hf__hair {
+  left: 72px;
+  top: 0;
+  width: 96px;
+  height: 112px;
+  border-radius: 50% 50% 40% 40%;
+  background: #04060a;
+}
+
+.hf__head {
+  left: 85px;
+  top: 6px;
+  width: 70px;
+  height: 84px;
+  border-radius: 50%;
+  background: #06090e;
+}
+
+.hf__neck {
+  left: 106px;
+  top: 78px;
+  width: 28px;
+  height: 26px;
+  background: #05080c;
+}
+
+/* Shoulders, then a waist that actually narrows: a uniform rounded box reads
+   as a fridge once the figure is more than half the frame tall. */
+.hf__torso {
+  left: 32px;
+  top: 96px;
+  width: 176px;
+  height: 82px;
+  border-radius: 60px 60px 0 0;
+  background: #070a0f;
+}
+
+.hf__torso::after {
+  content: '';
+  position: absolute;
+  left: 18px;
+  top: 74px;
+  width: 140px;
+  height: 182px;
+  clip-path: polygon(6% 0, 94% 0, 100% 100%, 0 100%);
+  background: linear-gradient(180deg, #06090d 0%, #04060a 100%);
+}
+
+.hf__leg {
+  top: 348px;
+  width: 56px;
+  height: 352px;
+  border-radius: 16px 16px 6px 6px;
+  background: linear-gradient(180deg, #05070b, #03050a);
+}
+.hf__leg--l { left: 62px; }
+.hf__leg--r { left: 122px; }
+
+.hf__arm {
+  top: 104px;
+  width: 26px;
+  height: 236px;
+  border-radius: 15px;
+  background: linear-gradient(180deg, #06090e, #030508);
+}
+.hf__arm--l { left: 8px; }
+.hf__arm--r { left: 206px; }
+
+/* The phone at the ear: the only warm thing in the corridor, and the reason
+   you can tell which way the person is facing. */
+.hf__phone {
+  left: 150px;
+  top: 30px;
+  width: 18px;
+  height: 76px;
+  border-radius: 6px;
+  background: linear-gradient(180deg, rgba(255, 247, 222, 0.98), rgba(255, 226, 170, 0.55));
+  box-shadow: 0 0 34px rgba(255, 232, 186, 0.6), 0 0 92px rgba(255, 226, 170, 0.3);
+}
+
+/* A palm over the lens: the frame goes before the sound does. */
+.hall__cover {
+  inset: -10%;
+  background: radial-gradient(56% 44% at 50% 110%, #04060a 0%, #04060a 54%, rgba(4, 6, 10, 0) 80%);
+  transform-origin: 50% 100%;
+}
+
+/* The corridor is lit from the far end, so it can carry less vignette than the
+   door feed: the planes have to stay readable right into the corners. */
+.hall .feed__vignette {
+  opacity: 0.62;
+}
+
+/* ===========================================================================
+   Part 4 — the recorder
+
+   The voicemail screen from the other side: a message being left, not played.
+   =========================================================================== */
+
+.stage--rec .backdrop {
+  background:
+    radial-gradient(58% 44% at 50% 38%, rgba(109, 183, 255, 0.08), rgba(109, 183, 255, 0) 70%),
+    linear-gradient(180deg, #0b1018 0%, #0a0e14 52%, #06080d 100%);
+}
+
+.rec {
+  position: absolute;
+  left: 96px;
+  right: 96px;
+  top: 560px;
+  bottom: 620px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.rec__head {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 26px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: rgba(214, 226, 244, 0.62);
+}
+
+.rec__dot {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--danger);
+  box-shadow: 0 0 22px rgba(255, 92, 104, 0.75);
+}
+
+.rec__label {
+  font-weight: 600;
+}
+
+.rec__to {
+  color: rgba(214, 226, 244, 0.4);
+  letter-spacing: 0.16em;
+}
+
+.rec__timer {
+  margin-top: 54px;
+  font-variant-numeric: tabular-nums;
+  font-size: 168px;
+  font-weight: 300;
+  letter-spacing: -0.02em;
+  color: #eef4ff;
+  text-shadow: 0 0 60px rgba(109, 183, 255, 0.28);
+}
+
+.rec__wave {
+  margin-top: 72px;
+  width: 100%;
+  height: 220px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.rec__bar {
+  flex: 1 1 auto;
+  min-width: 4px;
+  border-radius: 3px;
+  background: linear-gradient(180deg, rgba(109, 183, 255, 0.95), rgba(109, 183, 255, 0.34));
+}
+
+.rec__hint {
+  margin-top: 84px;
+  font-size: 26px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(214, 226, 244, 0.32);
+}

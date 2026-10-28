@@ -1,0 +1,176 @@
+{
+  "title": "It's Inside",
+  "slug": "its-inside",
+  "fictional": true,
+  "fictionLabel": "FICTIONAL STORY",
+  "format": {
+    "width": 1080,
+    "height": 1920,
+    "fps": 30
+  },
+  "audio": {
+    "mode": "local",
+    "tracks": [
+      {
+        "file": "audio/mix.wav",
+        "role": "mix",
+        "source": "synthesized score (room tone, line hiss, footsteps, grab, front door, latch) + processed voice-over",
+        "note": "assembled by audio/build-audio.sh from the vo-*.mp3 takes in this folder"
+      }
+    ]
+  },
+  "captions": [
+    {
+      "text": "it's inside.",
+      "atFrame": 0,
+      "durationFrames": 90
+    },
+    {
+      "text": "count the doors.",
+      "atFrame": 90,
+      "durationFrames": 180
+    },
+    {
+      "text": "one of them is open.",
+      "atFrame": 270,
+      "durationFrames": 108
+    },
+    {
+      "text": "you can't see me.",
+      "atFrame": 378,
+      "durationFrames": 66
+    },
+    {
+      "text": "i can see you.",
+      "atFrame": 444,
+      "durationFrames": 102
+    },
+    {
+      "text": "five steps away.",
+      "atFrame": 546,
+      "durationFrames": 120
+    },
+    {
+      "text": "closer.",
+      "atFrame": 666,
+      "durationFrames": 144
+    }
+  ],
+  "scenes": [
+    {
+      "id": "scene-01-hall",
+      "type": "hallway",
+      "startFrame": 0,
+      "durationFrames": 450,
+      "data": {
+        "statusTime": "9:02",
+        "zoom": 1,
+        "zoomTo": 1.55,
+        "originY": 1200,
+        "doorOpen": 0.05,
+        "lamp": 0.8,
+        "phoneGlow": 0.9,
+        "figure": {
+          "scale": 0.5,
+          "y": 0
+        },
+        "call": {
+          "caller": "You",
+          "callerSubtitle": "your number",
+          "timerStartSeconds": 31
+        },
+        "seed": "its-inside-hall"
+      },
+      "events": []
+    },
+    {
+      "id": "scene-02-turn",
+      "type": "hallway",
+      "startFrame": 450,
+      "durationFrames": 210,
+      "data": {
+        "statusTime": "9:02",
+        "zoom": 1.55,
+        "zoomTo": 1.62,
+        "originY": 1200,
+        "doorOpen": 0.05,
+        "lamp": 0.8,
+        "phoneGlow": 0.9,
+        "phoneGlowTo": 0.1,
+        "figure": {
+          "scale": 0.55,
+          "scaleTo": 1.0,
+          "y": 0,
+          "yTo": 100
+        },
+        "call": {
+          "caller": "You",
+          "callerSubtitle": "your number",
+          "timerStartSeconds": 46
+        },
+        "seed": "its-inside-turn"
+      },
+      "events": []
+    },
+    {
+      "id": "scene-03-close",
+      "type": "hallway",
+      "startFrame": 660,
+      "durationFrames": 150,
+      "data": {
+        "statusTime": "9:02",
+        "zoom": 1.62,
+        "zoomTo": 1.72,
+        "originY": 1200,
+        "doorOpen": 0.05,
+        "lamp": 0.8,
+        "phoneGlow": 0.1,
+        "figure": {
+          "scale": 1.0,
+          "scaleTo": 1.35,
+          "y": 100,
+          "yTo": 260,
+          "blur": 0,
+          "blurTo": 7
+        },
+        "cover": {
+          "atFrame": 56,
+          "frames": 26
+        },
+        "call": {
+          "caller": "You",
+          "callerSubtitle": "your number",
+          "timerStartSeconds": 53
+        },
+        "seed": "its-inside-close"
+      },
+      "events": []
+    },
+    {
+      "id": "scene-04-card",
+      "type": "end-card",
+      "startFrame": 810,
+      "durationFrames": 90,
+      "data": {
+        "blackoutFrames": 26,
+        "ruleAtFrame": 26,
+        "lines": [
+          {
+            "text": "PART 4: it was you.",
+            "atFrame": 30,
+            "revealFrames": 10
+          },
+          {
+            "text": "would you hang up?",
+            "atFrame": 36,
+            "accent": true,
+            "revealFrames": 10
+          }
+        ],
+        "arrow": true,
+        "arrowAtFrame": 46
+      },
+      "events": []
+    }
+  ]
+}

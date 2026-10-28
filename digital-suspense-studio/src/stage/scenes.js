@@ -549,6 +549,100 @@
   }
 
   // ---------------------------------------------------------------------------
+  // hallway: the same call, filmed from the other phone.
+  //
+  // The corridor is one flat drawing (see Components.hallView). This scene only
+  // decides where the camera is, how big the person at the end of the hall is,
+  // and when a hand covers the lens.
+  // ---------------------------------------------------------------------------
+
+  function renderHallway(scene, state) {
+    const data = scene.data;
+    const frame = state.localFrame;
+    const duration = Math.max(1, state.durationFrames);
+    const trip = Motion.ease.inOutCubic(clamp01(frame / duration));
+
+    const zoomFrom = Number(data.zoom) || 1;
+    const zoomTo = data.zoomTo === undefined ? zoomFrom : Number(data.zoomTo);
+    const zoom = zoomFrom + (zoomTo - zoomFrom) * trip;
+
+    // A phone held in one hand, walking. Same trick as the door feed.
+    const drift = {
+      x: Math.sin(frame / 53) * 4.5,
+      y: Math.sin(frame / 67 + 0.7) * 3.2,
+    };
+
+    const mix = (from, to) => {
+      const a = Number(from);
+      const b = Number(to);
+      const start = Number.isFinite(a) ? a : 0;
+      const end = Number.isFinite(b) ? b : start;
+      return start + (end - start) * trip;
+    };
+
+    const fig = data.figure || {};
+    const figure = {
+      scale: mix(fig.scale === undefined ? 1 : fig.scale, fig.scaleTo),
+      y: mix(fig.y === undefined ? 0 : fig.y, fig.yTo),
+      // A phone at arm's length cannot focus. Ramping the blur as the figure
+      // closes is what keeps a flat silhouette from looking like a diagram.
+      blur: mix(fig.blur === undefined ? 0 : fig.blur, fig.blurTo),
+      opacity: clamp01(fig.opacity === undefined ? 1 : fig.opacity),
+    };
+
+    const coverData = data.cover || {};
+    const coverAt = Number(coverData.atFrame);
+    const cover = Number.isFinite(coverAt)
+      ? tween(frame, coverAt, Math.max(1, Number(coverData.frames) || 18), Motion.ease.inCubic)
+      : 0;
+
+    const call = data.call;
+    const chrome = call
+      ? {
+          caller: call.caller,
+          callerSubtitle: call.callerSubtitle,
+          timer: Components.timerLabel((Number(call.timerStartSeconds) || 0) + frame / 30),
+        }
+      : null;
+
+    return screen({
+      statusTime: data.statusTime || '9:02',
+      extraClass: 'stage--call',
+      layer: Components.hallView({
+        zoom,
+        drift,
+        originY: data.originY,
+        tilt: data.tilt,
+        figure,
+        cover,
+        doorOpen: mix(data.doorOpen === undefined ? 0.4 : data.doorOpen, data.doorOpenTo),
+        lamp: mix(data.lamp === undefined ? 0.8 : data.lamp, data.lampTo),
+        phoneGlow: mix(data.phoneGlow === undefined ? 0.85 : data.phoneGlow, data.phoneGlowTo),
+        chrome,
+      }),
+      inner: fictionFooter(state, { fromFrame: 4 }),
+    });
+  }
+
+  // ---------------------------------------------------------------------------
+  // recorder: the screen that is making the message, not playing it.
+  // ---------------------------------------------------------------------------
+
+  function renderRecorder(scene, state) {
+    const data = scene.data;
+    const seconds = (Number(data.startSeconds) || 0) + state.localFrame / 30;
+    return screen({
+      statusTime: data.statusTime || '9:05',
+      extraClass: 'stage--rec',
+      layer: Components.recorder(
+        { label: data.label, to: data.to, seconds, seed: data.seed || scene.id },
+        state
+      ),
+      inner: fictionFooter(state, { fromFrame: 6 }),
+    });
+  }
+
+  // ---------------------------------------------------------------------------
   // street / reflection (scene extensions)
   // ---------------------------------------------------------------------------
 
@@ -628,6 +722,8 @@
     'photo-viewer': { render: renderPhotoViewer, label: 'Photo opened from a conversation' },
     'signal-loss': { render: renderSignalLoss, label: 'Phone dying - torn signal and static' },
     'video-call': { render: renderVideoCall, label: 'Answered video call - camera feed and self-view' },
+    hallway: { render: renderHallway, label: 'Interior corridor feed - someone at the far end' },
+    recorder: { render: renderRecorder, label: 'Voicemail being recorded - timer and level meter' },
     'system-alert': { render: renderSystemAlert, label: 'System alert' },
     street: { render: renderStreet, label: 'Rainy street insert' },
     reflection: { render: renderReflection, label: 'Mirror / doorway reveal' },
