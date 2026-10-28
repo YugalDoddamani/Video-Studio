@@ -352,6 +352,22 @@ Street geometry is generated once per `seed` (`mapGeometry`) from the same PRNG 
 rest of the stage uses and cached, so a re-render is byte-identical. `empty: true`
 drops the streets and pins for the closing state and renders `No devices found`.
 
+`origin` moves the point the zoom is anchored on. The first film anchored on her dot, so
+the streets grew around her and she never moved; a film that wants to push the camera into
+a building sets `origin` to the building and lets her dot leave the frame.
+
+A dot can also be given in **map space**: `selfMap` and `pinMap` take `{ "x": 170, "y": 980 }`
+or `[[frame, x, y], ...]`, and the dot rides the zoom with the streets. Use screen space
+(`pinX` / `pinY`) when the pin is doing the acting, map space when the camera is.
+
+Two annotations exist so a zoom means something: `home` draws a house glyph and a label at
+the anchor (it stays put while the streets rush in around it), and `flat` outlines the
+building with `{ width, height, opacity }` — `opacity` accepts a keyframe list so the
+outline can arrive as the zoom lands.
+
+`sheet: false` switches the device card off for scenes that need the whole frame. `0 m` is a
+distance the card can print: the ending of `arrived` is two rows printing the same number.
+
 The pin label resolving is a frame-accurate class swap (`map__pin-chip--flash`), not a
 CSS animation — animations run on the wall clock and would break determinism.
 
