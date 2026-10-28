@@ -18,7 +18,8 @@ manual work, while preserving an opportunity for human review.
 
 ## Standard workflow
 
-1. Receive a topic from the user or select one from `topics.md`.
+1. Receive a topic from the user, or take the highest-scoring `shortlisted`
+   topic from `content/topics.md`.
 2. Develop a short fictional premise.
 3. Write the story in the format defined in `02-story-and-writing.md`.
 4. Convert the story into timed scenes using reusable components.

@@ -743,13 +743,13 @@ Suggested future structure:
 
 ```text
 digital-suspense-studio/
-├── CONTENT-STRATEGY.md          # this document
-├── topics.md                    # readable backlog and status
+├── VIDEO_STUDIO_CONTENT_STRATEGY.md   # this document
+├── topics.md                          # pointer to content/topics.md
 ├── content/
-│   ├── topic-schema.md           # topic fields and scoring rubric
-│   ├── series-bible.md           # continuity rules and shared universe
-│   ├── analytics-log.csv         # post-level metrics
-│   └── experiments.md            # hypotheses and lessons
+│   ├── topics.md                      # backlog, fields, scores, status
+│   ├── continuity.md                  # continuity ledger / series rules
+│   ├── analytics.csv                  # post-level metrics (empty until posting)
+│   └── briefs/                        # production briefs before scaffolding
 └── projects/
     └── <slug>/
         ├── story.md
@@ -757,6 +757,9 @@ digital-suspense-studio/
         ├── publishing.md
         └── render-report.json
 ```
+
+*(The 20/20/20/15/10/10/5 rubric lives in §4.2 of this document rather than a
+separate `topic-schema.md`, so there is one source of truth.)*
 
 The agent should not create all these files automatically if an equivalent already exists. Inspect the repository first and avoid duplicate sources of truth.
 
