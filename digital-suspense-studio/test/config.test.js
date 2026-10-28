@@ -8,6 +8,7 @@ const os = require('os');
 
 const { validate } = require('../src/lib/config.js');
 const { galleryConfig } = require('../src/lib/gallery.js');
+const Scenes = require('../src/stage/scenes.js');
 const { sampleFrames, parseFrameList, frameName } = require('../src/lib/frames.js');
 const { PROJECTS_DIR, toPosix } = require('../src/lib/paths.js');
 
@@ -24,7 +25,6 @@ test('a well-formed config passes with no errors', () => {
 });
 
 test('the gallery renders every registered scene type', () => {
-  const Scenes = require('../src/stage/scenes.js');
   const types = new Set(galleryConfig().scenes.map((scene) => scene.type));
   Scenes.sceneTypes().forEach((type) => {
     assert.ok(types.has(type), `gallery covers "${type}"`);
@@ -35,7 +35,8 @@ test('the component gallery config is valid', () => {
   const { issues, config } = validate(galleryConfig());
   const errors = issues.filter((issue) => issue.severity === 'error');
   assert.deepEqual(errors, []);
-  assert.equal(config.scenes.length, 10);
+  // Parity with the registry: a new scene type must show up in the gallery.
+  assert.equal(config.scenes.length, Scenes.sceneTypes().length);
 });
 
 test('every shipped project config is valid', () => {

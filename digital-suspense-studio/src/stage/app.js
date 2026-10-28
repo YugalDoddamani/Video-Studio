@@ -73,6 +73,15 @@
   }
 
   /**
+   * Captions are a project-level layer: they outlive any single scene, so they
+   * are composed once against the global frame and painted over everything.
+   */
+  function captionMarkup(config, globalFrame) {
+    if (!config.captions || !config.captions.length) return '';
+    return Components.captionLayer(config.captions, globalFrame);
+  }
+
+  /**
    * Render a frame into the DOM.
    * Returns a small summary used by screenshots and layout checks.
    */
@@ -83,7 +92,7 @@
     const index = Timeline.sceneIndexAt(config, frame);
     const scene = config.scenes[index];
 
-    root.innerHTML = compose(config, frame);
+    root.innerHTML = compose(config, frame) + captionMarkup(config, frame);
     // Force layout so measurements below are accurate.
     void root.offsetHeight;
 
@@ -118,6 +127,7 @@
     '.lock__notif',
     '.screen__caption',
     '.street__caption',
+    '.caption__text',
   ];
 
   function rectOf(element) {

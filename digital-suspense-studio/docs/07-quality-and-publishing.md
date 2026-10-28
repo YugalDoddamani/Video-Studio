@@ -33,6 +33,20 @@
 - [ ] If no audio is present, the user is told.
 - [ ] ffprobe results are recorded or summarized.
 
+### If the video has its own mix
+
+- [ ] The mix is reproducible: a script under `projects/<slug>/audio/`
+      rebuilds the file from its stems, and the stems are committed.
+- [ ] `ffprobe` shows exactly one audio stream, AAC, matching the video
+      length (the encoder uses `-shortest`).
+- [ ] Levels were measured, not guessed. Record the peak/mean of the
+      loudest and quietest window in the render report or `story.md`.
+- [ ] The silence at the end is real silence. Digital silence is part of
+      the edit, not a missing track — `volumedetect` should read about
+      -91 dB, and a platform normaliser must not be allowed to pad it.
+- [ ] Say plainly if nobody listened to it. A measured mix is not an
+      auditioned mix, and the difference belongs in the report.
+
 Where tools permit, inspect a preview and sample frames throughout the video.
 Do not claim a visual review was performed if it was not.
 

@@ -119,17 +119,44 @@ Before the full render:
 
 ## Audio
 
-Audio is optional in the initial implementation.
+Silent is still the default: a project with `"audio": { "mode": "silent" }`
+renders with `-an` and `verify` asserts there is no audio stream.
 
-If audio assets are supplied:
-- Use only files with appropriate rights.
-- Store or reference them locally.
-- Define start and end times in the video configuration.
-- Keep sound effects from overpowering narration.
-- Check that audio is synchronized with visible events.
+A project can carry one mixed track instead:
 
-If no approved audio is available, create a silent video and report this.
-Do not assume TTS, commercial music, or external AI services are available.
+```json
+"audio": {
+  "mode": "local",
+  "tracks": [{ "file": "audio/mix.wav", "role": "mix" }]
+}
+```
+
+- The file is resolved relative to the project directory and validated at
+  config load, so a missing track fails before a 900 frame render.
+- `encode` mixes it with `-c:a aac -b:a 192k -shortest`; `verify` then asserts
+  an AAC stream is present and checks its sample rate.
+- Only the first track is used. Mix it yourself: `voicemail-from-tomorrow-30s`
+  ships `audio/build-audio.sh`, which layers the seven voice takes with a room
+  tone, a chime, a static burst, a ringtone and three knocks into one 30 s file.
+
+### Rules for generated audio
+
+- **Nothing third-party.** The 30 s cut's score is synthesized from FFmpeg's
+  signal generators and its voice is generated text-to-speech, so there is no
+  sample to clear. No commercial music, no licensed stingers.
+- **Measure levels, don't trust generators.** On this FFmpeg `sine` renders at
+  0.125 instead of full scale, and `amix` divides by its input count — a
+  fourteen-input mix comes out 23 dB quieter than the sum of its parts. So
+  `build-audio.sh` fits every element to a *measured* target (peak for the
+  effects, mean for the voice), sums them, measures the result, and applies one
+  make-up gain that puts the loudest moment of the film at −0.5 dBFS. The same
+  numbers then mean the same thing on a different FFmpeg.
+- **Deterministic noise only.** `anoisesrc` is unseeded on this build and
+  returns a different file each run; `aevalsrc`'s `random()` is deterministic
+  and keeps a rebuild byte-identical.
+- **Report the limitation.** `render-report.json` records `audio.mode` and
+  whether the film is silent, so a silent render can never be mistaken for a
+  mixed one.
 
 ## Storage
 

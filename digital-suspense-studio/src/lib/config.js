@@ -23,6 +23,43 @@ function warn(message, where) {
   return { severity: 'warn', message, where };
 }
 
+/** Lowercase, strip punctuation, collapse whitespace - for caption/line compare. */
+function normaliseLine(text) {
+  return String(text || '')
+    .toLowerCase()
+    .replace(/[\u2018\u2019]/g, "'")
+    .replace(/[\u201c\u201d]/g, '"')
+    .replace(/[^a-z0-9' ]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+/** Every line the viewer will hear or read inside a phone surface. */
+function collectSpokenLines(raw) {
+  const lines = new Set();
+  (raw.scenes || []).forEach((scene) => {
+    const data = (scene && scene.data) || {};
+    const transcript = data.transcript || {};
+    const transcriptLines = Array.isArray(transcript) ? transcript : transcript.lines || [];
+    transcriptLines.forEach((line) => {
+      const text = typeof line === 'string' ? line : (line && line.text) || '';
+      const normalised = normaliseLine(text);
+      if (normalised) lines.add(normalised);
+    });
+    if (Array.isArray(data.lines)) {
+      data.lines.forEach((line) => {
+        const normalised = normaliseLine(line && line.text);
+        if (normalised) lines.add(normalised);
+      });
+    }
+    if (data.caption) {
+      const normalised = normaliseLine(data.caption);
+      if (normalised) lines.add(normalised);
+    }
+  });
+  return lines;
+}
+
 /**
  * Validate a raw (un-normalized) video config.
  * Returns { issues, config } where config is normalized.
@@ -112,6 +149,36 @@ function validate(raw, options) {
     if (config.durationSeconds > 90) {
       issues.push(warn(`The video is ${config.durationSeconds.toFixed(1)}s. Reels are usually under 90s.`, 'scenes'));
     }
+
+    // Caption layer rules: one idea per card, five words maximum, and never a
+    // transcription of what the voice-over is already saying.
+    if (Array.isArray(config.captions)) {
+      const spoken = collectSpokenLines(raw);
+      let previousEnd = -1;
+      config.captions.forEach((caption, index) => {
+        const where = `captions[${index}]`;
+        if (!caption.text.trim()) issues.push(error('Caption is missing "text".', where));
+        if (caption.durationFrames <= 0) {
+          issues.push(error('Caption "durationFrames" must be a positive whole number of frames.', `${where}.durationFrames`));
+          return;
+        }
+        const words = caption.text.trim().split(/\s+/).filter(Boolean);
+        if (words.length > 5) {
+          issues.push(warn(`Caption has ${words.length} words. Keep caption cards to five or fewer.`, where));
+        }
+        if (spoken.has(normaliseLine(caption.text))) {
+          issues.push(warn('Caption repeats a spoken line verbatim. Captions should add a second layer, not transcribe.', where));
+        }
+        if (caption.atFrame < previousEnd) {
+          issues.push(warn('Caption starts before the previous card ends; only one card can be read at a time.', where));
+        }
+        if (caption.endFrame > config.totalFrames) {
+          issues.push(warn(`Caption ends at frame ${caption.endFrame}, past the end of the film (${config.totalFrames}).`, where));
+        }
+        previousEnd = Math.max(previousEnd, caption.endFrame);
+      });
+    }
+
     if (opts.projectDir) {
       (config.audio.tracks || []).forEach((track, index) => {
         const file = track.file || track.path;

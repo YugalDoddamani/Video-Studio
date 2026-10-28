@@ -66,6 +66,7 @@ body {
 }
 
 #root {
+  position: relative;
   width: 1080px;
   height: 1920px;
   overflow: hidden;
@@ -801,9 +802,10 @@ body {
   color: var(--text-secondary);
 }
 
+/* Raised so the action labels clear the disclosure chip underneath them. */
 .call__actions {
   position: absolute;
-  bottom: 430px;
+  bottom: 500px;
   display: flex;
   gap: 210px;
 }
@@ -1912,6 +1914,8 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  /* The backdrop covers this, but the blackout beat renders the stage bare. */
+  background: #000;
 }
 
 .endcard__glow {
@@ -1962,4 +1966,295 @@ body {
   letter-spacing: 1px;
   color: var(--text-secondary);
   opacity: 0.85;
+}
+
+/* ==========================================================================
+   30s revision additions
+   Caption layer, the dark room the film opens in, the signal-loss scene, and
+   the windowed transcript. Everything below is sized for the 1080x1920 canvas.
+   ========================================================================== */
+
+/* ----------------------------------------------------------- caption layer */
+
+/*
+ * A fixed band, deliberately low. A caption that moves around forces the
+ * viewer to hunt for it, which is the opposite of what a hook needs.
+ */
+.captions {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 1180px;
+  height: 168px;
+  z-index: 9;
+  pointer-events: none;
+}
+
+.caption {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  text-align: center;
+}
+
+/* Keeps the text legible over full-frame static without a visible box. */
+.caption__scrim {
+  position: absolute;
+  left: -40px;
+  right: -40px;
+  top: -52px;
+  bottom: -52px;
+  background: radial-gradient(
+    ellipse 58% 54% at 50% 50%,
+    rgba(4, 6, 11, 0.86),
+    rgba(4, 6, 11, 0.5) 56%,
+    rgba(4, 6, 11, 0) 80%
+  );
+  filter: blur(4px);
+  pointer-events: none;
+}
+
+.caption__text {
+  position: relative;
+  margin: 0 auto;
+  max-width: 920px;
+  padding: 0 44px;
+  font-size: 50px;
+  font-weight: 500;
+  line-height: 1.32;
+  letter-spacing: 0.2px;
+  color: #f2f6fb;
+  text-shadow: 0 4px 28px rgba(0, 0, 0, 0.9);
+}
+
+.caption__hot {
+  color: var(--warning);
+  font-weight: 600;
+  letter-spacing: 1.2px;
+}
+
+/* ------------------------------------------------------------- dark room */
+
+/* Strokes the room around a sleeping phone so the hook has a place to happen. */
+.room {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.room__wall {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, #0c1018 0%, #0a0d14 44%, #05070b 100%);
+}
+
+.room__window {
+  position: absolute;
+  left: 112px;
+  top: 300px;
+  width: 296px;
+  height: 430px;
+  border: 3px solid rgba(150, 176, 212, 0.1);
+  background: linear-gradient(180deg, rgba(26, 40, 62, 0.34), rgba(8, 12, 19, 0.24));
+  box-shadow: inset 0 0 90px rgba(0, 0, 0, 0.85);
+}
+
+/* A mullion, so the shape reads as a window rather than a lit rectangle. */
+.room__window::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(0, 0, 0, 0) calc(50% - 3px),
+    rgba(8, 12, 19, 0.9) calc(50% - 3px),
+    rgba(8, 12, 19, 0.9) calc(50% + 3px),
+    rgba(0, 0, 0, 0) calc(50% + 3px)
+  );
+}
+
+.room__door {
+  position: absolute;
+  right: 88px;
+  top: 236px;
+  width: 322px;
+  height: 742px;
+  background: linear-gradient(180deg, rgba(16, 21, 31, 0.95), rgba(5, 8, 12, 0.97));
+  border-left: 2px solid rgba(150, 176, 212, 0.07);
+  border-top: 2px solid rgba(150, 176, 212, 0.055);
+}
+
+/* Handle, at the height a handle actually sits. */
+.room__door::after {
+  content: '';
+  position: absolute;
+  left: 34px;
+  top: 46%;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: rgba(176, 198, 226, 0.13);
+  box-shadow: 0 0 18px rgba(150, 176, 212, 0.08);
+}
+
+.room__floor {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 540px;
+  background: linear-gradient(180deg, rgba(9, 12, 19, 0), rgba(3, 5, 9, 0.92));
+}
+
+/* The phone's own light, thrown up the wall from the bottom of frame. */
+.room__glow {
+  position: absolute;
+  left: 50%;
+  bottom: -300px;
+  transform: translateX(-50%);
+  width: 1180px;
+  height: 1180px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(109, 183, 255, 0.3), rgba(109, 183, 255, 0) 64%);
+  filter: blur(46px);
+  pointer-events: none;
+}
+
+.room__dim {
+  position: absolute;
+  inset: 0;
+  background: #000;
+  pointer-events: none;
+}
+
+/* The chrome of a waking phone: everything above the room fades in together. */
+.wake {
+  position: absolute;
+  inset: 0;
+}
+
+/* The hook has a caption band under the notification, so it sits higher. */
+.stage--room .lock__notif {
+  top: 892px;
+}
+
+/* --------------------------------------------------------- windowed transcript */
+
+/*
+ * Only the last N lines are kept. The card has a fixed height and stacks from
+ * the bottom, so a new line pushes the older one up instead of resizing the
+ * player mid-sentence.
+ */
+.transcript--window {
+  /* Pulled tight to the waveform: the card has to end above the caption band
+     at 1180px, and its own height is fixed by the two-line window. The padding
+     is trimmed here (not globally) so four rendered rows still fit. */
+  margin-top: 2px;
+  height: 336px;
+  padding-top: 24px;
+  padding-bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.transcript--window .transcript__label {
+  margin-bottom: 14px;
+}
+
+/* Two lines of a windowed transcript are up to four rendered rows; 38px keeps
+   the whole card short enough to clear the caption band below it. */
+.transcript--window .transcript__line {
+  font-size: 38px;
+  line-height: 1.4;
+}
+
+.transcript--window .transcript__lines {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  overflow: hidden;
+}
+
+/* --------------------------------------------------------------- signal loss */
+
+.stage--loss {
+  background: #05070b;
+}
+
+.loss__picture {
+  position: absolute;
+  inset: 0;
+}
+
+.loss__tear {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.loss__band {
+  position: absolute;
+  left: -60px;
+  right: -60px;
+  background: linear-gradient(90deg, rgba(190, 220, 255, 0.08), rgba(240, 248, 255, 0.6), rgba(190, 220, 255, 0.08));
+  mix-blend-mode: screen;
+}
+
+.loss__snow {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  background: #0a0d13;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.loss__speck {
+  position: absolute;
+  background: #e8f1ff;
+}
+
+.loss__scanlines {
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(255, 255, 255, 0.07) 0px,
+    rgba(255, 255, 255, 0.07) 1px,
+    rgba(0, 0, 0, 0) 3px
+  );
+}
+
+.loss__flash {
+  position: absolute;
+  inset: 0;
+  background: #dfe9ff;
+  mix-blend-mode: screen;
+}
+
+.loss__black {
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+  background: #05070b;
+}
+
+/* The disclosure stays on top of the noise: the label is a promise, not decor. */
+.stage--loss .fiction-wrap {
+  z-index: 9;
+}
+
+/* ----------------------------------------------------------------- end card */
+
+.endcard__arrow {
+  margin-top: 36px;
+  display: flex;
+  justify-content: center;
+  color: var(--warning);
 }
