@@ -2258,3 +2258,251 @@ body {
   justify-content: center;
   color: var(--warning);
 }
+
+/* ==========================================================================
+   Part 2 additions
+   "You Answer": an answered video call. The feed is a phone pointed at a door;
+   the self-view is the person holding it. Everything below is sized for the
+   1080x1920 canvas and layered around the caption band at 1180px.
+   ========================================================================== */
+
+.stage--call {
+  background: #05070b;
+}
+
+/* --------------------------------------------------------------------- feed */
+
+.feed {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: #05070b;
+}
+
+/* The camera world. Zoom and handheld drift are applied here, so the door, the
+   floor and the light strip all move together. */
+.feed__world {
+  position: absolute;
+  inset: 0;
+  /* Scaled about the floor line: pushing in on the door keeps the strip of
+     light under it in the same place, the way a real camera would. */
+  transform-origin: 50% 1120px;
+}
+
+.feed__wall {
+  position: absolute;
+  inset: -400px;
+  background:
+    radial-gradient(52% 26% at 50% 104%, rgba(240, 223, 180, 0.16), rgba(240, 223, 180, 0) 72%),
+    radial-gradient(96% 54% at 50% 4%, rgba(150, 176, 214, 0.16), rgba(0, 0, 0, 0) 62%),
+    linear-gradient(180deg, #131922 0%, #0b0f16 48%, #06080d 100%);
+}
+
+.feed__floor {
+  position: absolute;
+  left: -400px;
+  right: -400px;
+  top: 1116px;
+  height: 1000px;
+  background: linear-gradient(180deg, rgba(240, 223, 180, 0.09), rgba(240, 223, 180, 0.02) 18%, rgba(0, 0, 0, 0) 60%);
+}
+
+.feed__door {
+  position: absolute;
+  left: 50%;
+  top: 300px;
+  width: 404px;
+  height: 820px;
+  margin-left: -202px;
+  background: linear-gradient(180deg, #26303e 0%, #1c242f 44%, #121922 76%, #0a0e15 100%);
+  border: 3px solid rgba(176, 200, 233, 0.3);
+  box-shadow:
+    0 40px 120px rgba(0, 0, 0, 0.9),
+    inset 0 2px 0 rgba(200, 220, 245, 0.14),
+    inset 0 0 150px rgba(0, 0, 0, 0.55);
+}
+
+.feed__panel {
+  position: absolute;
+  left: 34px;
+  right: 34px;
+  border: 2px solid rgba(176, 200, 233, 0.22);
+  background: linear-gradient(180deg, rgba(210, 230, 255, 0.05), rgba(0, 0, 0, 0.22));
+  box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.35);
+}
+
+.feed__panel--top {
+  top: 62px;
+  height: 300px;
+}
+
+.feed__panel--bottom {
+  top: 408px;
+  height: 348px;
+}
+
+.feed__handle {
+  position: absolute;
+  right: 26px;
+  top: 356px;
+  width: 24px;
+  height: 92px;
+  border-radius: 7px;
+  background: linear-gradient(180deg, #5a6676, #1d242e 72%);
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.7);
+}
+
+/* The hallway light under the door. When this goes out, the whole film turns. */
+.feed__strip {
+  position: absolute;
+  left: -8px;
+  right: -8px;
+  bottom: -15px;
+  height: 15px;
+  background: linear-gradient(180deg, #f6e7bf, #cdb489);
+  box-shadow: 0 0 46px 15px rgba(232, 214, 172, 0.42), 0 0 130px 34px rgba(232, 214, 172, 0.18);
+}
+
+.feed__scanlines {
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.022) 0px, rgba(255, 255, 255, 0.022) 1px, rgba(0, 0, 0, 0) 3px);
+  pointer-events: none;
+}
+
+/* Auto-exposure: with the hallway light gone, the camera opens up. */
+.feed__glow {
+  position: absolute;
+  left: -120px;
+  right: -120px;
+  bottom: -260px;
+  height: 940px;
+  background: radial-gradient(58% 52% at 50% 100%, rgba(158, 186, 226, 0.34), rgba(158, 186, 226, 0) 72%);
+  pointer-events: none;
+}
+
+.feed__vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(116% 66% at 50% 46%, rgba(0, 0, 0, 0) 40%, rgba(0, 0, 0, 0.62) 100%);
+  pointer-events: none;
+}
+
+/* ----------------------------------------------------------------------- pip */
+
+/* The self-view sits above the caption band and to the right of the top bar:
+   it is the one part of the frame the viewer has to be told to look at. */
+.pip {
+  position: absolute;
+  right: 80px;
+  top: 372px;
+  width: 280px;
+  height: 372px;
+  border-radius: 26px;
+  overflow: hidden;
+  background: #06090e;
+  border: 2px solid rgba(226, 238, 255, 0.16);
+  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.7);
+}
+
+.pip__wall {
+  position: absolute;
+  inset: 0;
+  /* A backlight behind the figure: without it the silhouette is a black shape
+     on a black room and reads as a smudge rather than a person. */
+  background:
+    radial-gradient(58% 44% at 50% 26%, rgba(150, 176, 214, 0.2), rgba(0, 0, 0, 0) 74%),
+    linear-gradient(180deg, #0e131c 0%, #070a10 100%);
+}
+
+/* The door behind you - the same door as the feed, seen from the inside. */
+.pip__door {
+  position: absolute;
+  left: 50%;
+  top: 96px;
+  height: 250px;
+  margin-left: -76px;
+  background: linear-gradient(180deg, rgba(246, 231, 191, 0.85), rgba(232, 214, 172, 0.2));
+  box-shadow: 0 0 54px 14px rgba(232, 214, 172, 0.22);
+}
+
+.pip__figure {
+  position: absolute;
+  left: 50%;
+  bottom: -46px;
+  width: 196px;
+  height: 604px;
+  transform: translateX(-50%) scale(0.52);
+  transform-origin: 50% 100%;
+  filter: drop-shadow(0 0 18px rgba(150, 176, 214, 0.35));
+  z-index: 2;
+}
+
+/* ------------------------------------------------------------------- chrome */
+
+.call__top {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 236px;
+  height: 220px;
+  padding: 0 92px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  background: linear-gradient(180deg, rgba(3, 5, 9, 0.72), rgba(3, 5, 9, 0));
+  pointer-events: none;
+}
+
+.call__who {
+  display: flex;
+  flex-direction: column;
+}
+
+.call__name {
+  font-size: 46px;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  color: #eef4fc;
+  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.85);
+}
+
+.call__sub {
+  margin-top: 8px;
+  font-size: 26px;
+  letter-spacing: 1.6px;
+  color: rgba(206, 220, 240, 0.62);
+}
+
+.call__timer {
+  margin-top: 6px;
+  font-size: 32px;
+  font-variant-numeric: tabular-nums;
+  color: rgba(238, 244, 252, 0.86);
+  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.85);
+}
+
+/* Three circles, no labels: this is a phone that answered, not a menu. */
+.call__actions--video {
+  bottom: 414px;
+  gap: 150px;
+}
+
+.call__action--mute,
+.call__action--flip {
+  background: rgba(233, 241, 252, 0.1);
+  border: 2px solid rgba(233, 241, 252, 0.18);
+  color: rgba(233, 241, 252, 0.82);
+}
+
+.call__action--end {
+  background: var(--danger);
+  border: 2px solid var(--danger);
+  color: #fff;
+  box-shadow: 0 18px 50px rgba(255, 92, 104, 0.35);
+}
+
+/* The self-view is the whole point, so the caption band keeps its distance. */
+.stage--call .fiction-wrap {
+  z-index: 9;
+}

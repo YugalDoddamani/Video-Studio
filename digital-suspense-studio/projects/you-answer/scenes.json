@@ -1,0 +1,163 @@
+{
+  "title": "You Answer",
+  "slug": "you-answer",
+  "cut": "part 2 of Voicemail from Tomorrow",
+  "fictional": true,
+  "fictionLabel": "FICTIONAL STORY",
+  "description": "You accept a video call from your own number. The caller is standing outside your door. You are standing inside it.",
+  "format": {
+    "width": 1080,
+    "height": 1920,
+    "fps": 30
+  },
+  "audio": {
+    "mode": "local",
+    "tracks": [
+      {
+        "file": "audio/mix.wav",
+        "role": "mix",
+        "source": "synthesized score (room tone, call hiss, switch, static, knocks, latch) + processed voice-over",
+        "note": "assembled by audio/build-audio.sh from the six vo-*.mp3 takes in this folder"
+      }
+    ]
+  },
+  "captions": [
+    {
+      "text": "you picked up.",
+      "atFrame": 0,
+      "durationFrames": 90
+    },
+    {
+      "text": "your number. your hallway.",
+      "atFrame": 90,
+      "durationFrames": 180
+    },
+    {
+      "text": "but you're inside.",
+      "atFrame": 270,
+      "durationFrames": 108
+    },
+    {
+      "text": "you locked it from inside.",
+      "atFrame": 378,
+      "durationFrames": 108
+    },
+    {
+      "text": "the small picture, top right",
+      "atFrame": 486,
+      "durationFrames": 60
+    },
+    {
+      "text": "it's your back",
+      "atFrame": 546,
+      "durationFrames": 55
+    },
+    {
+      "text": "don't turn around",
+      "atFrame": 601,
+      "durationFrames": 29
+    }
+  ],
+  "scenes": [
+    {
+      "id": "scene-01-call-wide",
+      "type": "video-call",
+      "startFrame": 0,
+      "durationFrames": 450,
+      "data": {
+        "caller": "Me",
+        "callerSubtitle": "your number",
+        "status": "Video call",
+        "timerStartSeconds": 4,
+        "zoom": 0.86,
+        "zoomTo": 1.02,
+        "strip": {
+          "outAtFrame": 9999
+        },
+        "pip": {
+          "doorAtFrame": 9999,
+          "doorFrames": 1
+        },
+        "seed": "you-answer-wide"
+      },
+      "events": []
+    },
+    {
+      "id": "scene-02-call-close",
+      "type": "video-call",
+      "startFrame": 450,
+      "durationFrames": 180,
+      "data": {
+        "caller": "Me",
+        "callerSubtitle": "your number",
+        "status": "Video call",
+        "timerStartSeconds": 19,
+        "zoom": 1.5,
+        "zoomTo": 1.57,
+        "strip": {
+          "outAtFrame": 12,
+          "outFrames": 3
+        },
+        "pip": {
+          "doorAtFrame": 78,
+          "doorFrames": 35
+        },
+        "seed": "you-answer-close"
+      },
+      "events": []
+    },
+    {
+      "id": "scene-03-signal",
+      "type": "signal-loss",
+      "startFrame": 630,
+      "durationFrames": 180,
+      "data": {
+        "picture": "call",
+        "seed": "you-answer-static",
+        "call": {
+          "caller": "Me",
+          "callerSubtitle": "your number",
+          "status": "Video call",
+          "timerSeconds": 24,
+          "zoom": 1.57,
+          "strip": 0,
+          "pipDoor": 1
+        },
+        "loss": {
+          "atFrame": 0,
+          "tearFrames": 18,
+          "snowAtFrame": 12,
+          "snowFrames": 24,
+          "blackFrames": 60
+        }
+      },
+      "events": []
+    },
+    {
+      "id": "scene-04-end",
+      "type": "end-card",
+      "startFrame": 810,
+      "durationFrames": 90,
+      "data": {
+        "blackoutFrames": 30,
+        "ruleAtFrame": 30,
+        "lines": [
+          {
+            "text": "PART 3: it's inside.",
+            "atFrame": 34,
+            "revealFrames": 10
+          },
+          {
+            "text": "would you look behind you?",
+            "atFrame": 40,
+            "accent": true,
+            "revealFrames": 10
+          }
+        ],
+        "arrow": true,
+        "arrowAtFrame": 50
+      },
+      "events": []
+    }
+  ]
+}
