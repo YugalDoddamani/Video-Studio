@@ -131,24 +131,9 @@
             150,
             610
           ]
-        ],
-        "wake": {
-          "atFrame": -16,
-          "durationFrames": 26
-        }
+        ]
       },
-      "events": [
-        {
-          "type": "show-notification",
-          "atFrame": 0,
-          "durationFrames": 10
-        },
-        {
-          "type": "highlight-timestamp",
-          "atFrame": 0,
-          "durationFrames": 8
-        }
-      ]
+      "events": []
     },
     {
       "id": "scene-02-street",
@@ -508,8 +493,7 @@
           "goneName": "No location found",
           "goneMeta": "Last updated —",
           "sheetTitle": "Devices",
-          "deviceModel": "iPhone 15 Pro",
-          "rows": null
+          "deviceModel": "iPhone 15 Pro"
         },
         "loss": {
           "atFrame": 4,
