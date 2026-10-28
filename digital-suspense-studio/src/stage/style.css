@@ -2851,3 +2851,287 @@ body {
   text-transform: uppercase;
   color: rgba(214, 226, 244, 0.32);
 }
+
+
+/* --------------------------------------------------------------------- map */
+
+.stage--map {
+  background: #060a10;
+}
+
+.map {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: #0c141d;
+}
+
+/* The zoom is anchored on her dot at (540, 720): the streets expand around
+   her, and she never moves. */
+.map__layer {
+  position: absolute;
+  inset: 0;
+  transform-origin: 540px 720px;
+}
+
+.map__svg {
+  position: absolute;
+  left: -540px;
+  top: -360px;
+  display: block;
+}
+
+.map__shade {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(5, 8, 13, 0.94) 0%, rgba(5, 8, 13, 0.42) 240px, rgba(5, 8, 13, 0) 430px),
+    linear-gradient(0deg, rgba(5, 8, 13, 0.9) 0%, rgba(5, 8, 13, 0.62) 300px, rgba(5, 8, 13, 0) 640px);
+}
+
+.map__accuracy {
+  position: absolute;
+  width: 170px;
+  height: 170px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(109, 183, 255, 0.16);
+  background: radial-gradient(
+    circle,
+    rgba(109, 183, 255, 0.17) 0%,
+    rgba(109, 183, 255, 0.06) 52%,
+    rgba(109, 183, 255, 0) 72%
+  );
+}
+
+.map__self {
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  margin: -20px 0 0 -20px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 5px rgba(109, 183, 255, 0.26), 0 2px 20px rgba(109, 183, 255, 0.55);
+}
+
+.map__self-ring {
+  position: absolute;
+  inset: -18px;
+  border-radius: 50%;
+  border: 2px solid rgba(109, 183, 255, 0.22);
+}
+
+.map__pin-dot {
+  position: absolute;
+  width: 34px;
+  height: 34px;
+  margin: -17px 0 0 -17px;
+  border-radius: 50%;
+  background: #e7edf5;
+  border: 5px solid #16202c;
+  box-shadow: 0 0 0 4px rgba(6, 10, 16, 0.6), 0 6px 18px rgba(0, 0, 0, 0.6);
+}
+
+.map__pin {
+  position: absolute;
+  transform: translate(-50%, calc(-100% - 16px));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.map__pin-chip {
+  font-size: 30px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  color: var(--text-primary);
+  background: rgba(28, 37, 52, 0.97);
+  border: 1.5px solid rgba(109, 183, 255, 0.22);
+  border-radius: 18px;
+  padding: 12px 26px;
+  white-space: nowrap;
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.58);
+}
+
+/* The name resolving is one frame-accurate flash, not an animation, so the
+   same frame always renders the same pixels. */
+.map__pin-chip--flash {
+  background: rgba(109, 183, 255, 0.3);
+  border-color: rgba(109, 183, 255, 0.85);
+}
+
+.map__chip {
+  position: absolute;
+  left: 50%;
+  top: 396px;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  padding: 16px 34px 20px;
+  border-radius: 26px;
+  background: rgba(17, 24, 39, 0.88);
+  border: 1.5px solid rgba(109, 183, 255, 0.16);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.55);
+}
+
+.map__chip-value {
+  font-size: 62px;
+  font-weight: 700;
+  letter-spacing: -1.5px;
+  line-height: 1.05;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.map__chip-unit {
+  font-size: 28px;
+  font-weight: 500;
+  letter-spacing: 1px;
+  color: var(--text-secondary);
+}
+
+.map__banner {
+  position: absolute;
+  left: 90px;
+  right: 90px;
+  top: 250px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 24px 30px;
+  border-radius: 24px;
+  background: rgba(17, 24, 39, 0.95);
+  border: 1.5px solid rgba(109, 183, 255, 0.18);
+  box-shadow: 0 22px 54px rgba(0, 0, 0, 0.62);
+}
+
+.map__banner-icon {
+  display: flex;
+  color: var(--accent);
+}
+
+.map__banner-text {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.map__banner-title {
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.map__banner-body {
+  font-size: 26px;
+  color: var(--text-secondary);
+}
+
+.map__sheet {
+  position: absolute;
+  left: 90px;
+  right: 90px;
+  top: 878px;
+  padding: 26px 30px 12px;
+  border-radius: 30px;
+  background: rgba(13, 19, 29, 0.93);
+  border: 1.5px solid rgba(42, 53, 71, 0.9);
+  box-shadow: 0 26px 62px rgba(0, 0, 0, 0.62);
+}
+
+.map__sheet-head {
+  display: block;
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: 3.2px;
+  color: rgba(169, 180, 196, 0.7);
+  margin-bottom: 12px;
+}
+
+.map__row {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 17px 0;
+}
+
+.map__row + .map__row {
+  border-top: 1.5px solid rgba(42, 53, 71, 0.7);
+}
+
+.map__row-dot {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 12px rgba(109, 183, 255, 0.6);
+}
+
+.map__row-dot--muted {
+  background: rgba(169, 180, 196, 0.4);
+  box-shadow: none;
+}
+
+.map__row-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.map__row-name {
+  font-size: 32px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.map__row-meta {
+  font-size: 24px;
+  color: rgba(169, 180, 196, 0.8);
+}
+
+.map__row-dist {
+  font-size: 30px;
+  font-weight: 600;
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+}
+
+.map__row--muted .map__row-name {
+  color: rgba(169, 180, 196, 0.88);
+}
+
+.map__row--muted .map__row-dist {
+  color: rgba(169, 180, 196, 0.6);
+}
+
+.map--empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(120% 78% at 50% 42%, #0b1320 0%, #060a10 62%, #04070b 100%);
+}
+
+.map__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.map__empty-title {
+  font-size: 46px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  color: rgba(233, 238, 245, 0.94);
+}
+
+.map__empty-sub {
+  font-size: 25px;
+  font-weight: 500;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: rgba(169, 180, 196, 0.6);
+}

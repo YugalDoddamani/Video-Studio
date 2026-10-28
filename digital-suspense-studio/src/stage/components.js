@@ -852,6 +852,186 @@
   // Scene extension: PhoneReflection
   // ---------------------------------------------------------------------------
 
+  // ---------------------------------------------------------------------------
+  // MapView - a night map, two pins, one device sheet
+  //
+  // Everything is drawn: no tiles, no network, no image assets. Street
+  // geometry is generated once per seed from the same PRNG as the rest of the
+  // stage, so the same frame always yields the same pixels. Pins are placed in
+  // screen space by the scene renderer and deliberately do not move with the
+  // zoom - a device that converges on the centre of the frame while the map
+  // expands under it is the whole point of the scene.
+  // ---------------------------------------------------------------------------
+
+  const MAP_CACHE = {};
+
+  function mapGeometry(seed) {
+    const key = String(seed || 'map');
+    if (MAP_CACHE[key]) return MAP_CACHE[key];
+    const values = seededSeries(`${key}:streets`, 900);
+    let cursor = 0;
+    const next = () => values[cursor++ % values.length];
+
+    const minor = [];
+    const major = [];
+    const alleys = [];
+
+    // A city is not a grid. Spacing wanders between 68 and 132 px, roughly one
+    // street in six stops in mid-block, and short cross-streets are cut
+    // against the block they belong to.
+    let x = -120;
+    while (x < 2320) {
+      const px = x + (next() - 0.5) * 30;
+      if (next() < 0.17) {
+        const from = 120 + next() * 1500;
+        minor.push(`M${px.toFixed(1)} ${from.toFixed(0)}V${(from + 260 + next() * 900).toFixed(0)}`);
+      } else {
+        minor.push(`M${px.toFixed(1)} -140V2300`);
+      }
+      if (next() < 0.22) {
+        const alleyY = 120 + next() * 1900;
+        const alleyX = px + 30 + next() * 60;
+        alleys.push(`M${alleyX.toFixed(1)} ${alleyY.toFixed(0)}h${(40 + next() * 90).toFixed(0)}`);
+      }
+      x += 68 + next() * 64;
+    }
+
+    let y = -120;
+    while (y < 2320) {
+      const py = y + (next() - 0.5) * 26;
+      if (next() < 0.15) {
+        const from = 80 + next() * 1600;
+        minor.push(`M${from.toFixed(0)} ${py.toFixed(1)}H${(from + 300 + next() * 800).toFixed(0)}`);
+      } else {
+        minor.push(`M-140 ${py.toFixed(1)}H2300`);
+      }
+      y += 62 + next() * 58;
+    }
+
+    // Arterials sit on top of the grid at roughly a five-block rhythm.
+    for (let i = 0; i < 4; i += 1) {
+      const arterialX = 160 + i * 540 + (next() - 0.5) * 90;
+      major.push(`M${arterialX.toFixed(1)} -140V2300`);
+      const arterialY = 190 + i * 500 + (next() - 0.5) * 80;
+      major.push(`M-140 ${arterialY.toFixed(1)}H2300`);
+    }
+
+    const geometry = { minor: minor.join(''), major: major.join(''), alleys: alleys.join('') };
+    MAP_CACHE[key] = geometry;
+    return geometry;
+  }
+
+  function mapView(props) {
+    const p = props || {};
+    if (p.empty) {
+      return `
+        <div class="map map--empty">
+          <div class="map__empty">
+            <span class="map__empty-title">${esc(p.emptyTitle || 'No devices found')}</span>
+            <span class="map__empty-sub">${esc(p.emptySub || 'Last updated —')}</span>
+          </div>
+        </div>`;
+    }
+
+    const zoom = num(p.zoom, 1);
+    const panX = num(p.panX, 0);
+    const panY = num(p.panY, 0);
+    const geo = mapGeometry(p.seed);
+
+    const self = p.self || {};
+    const other = p.other || {};
+    const chip = p.chip || {};
+    const banner = p.banner || null;
+
+    const selfOpacity = clamp01(num(self.opacity, 1));
+    const otherOpacity = clamp01(num(other.opacity, 1));
+    const accuracy = Math.max(0.5, num(p.accuracy, 1));
+
+    const rows = (p.rows || [])
+      .map((row) => {
+        const tone = row.tone ? ` map__row--${esc(row.tone)}` : '';
+        const dotTone = row.tone ? ` map__row-dot--${esc(row.tone)}` : '';
+        return `
+          <div class="map__row${tone}">
+            <span class="map__row-dot${dotTone}"></span>
+            <span class="map__row-text">
+              <span class="map__row-name">${esc(row.name)}</span>
+              ${row.meta ? `<span class="map__row-meta">${esc(row.meta)}</span>` : ''}
+            </span>
+            ${row.dist ? `<span class="map__row-dist">${esc(row.dist)}</span>` : ''}
+          </div>`;
+      })
+      .join('');
+
+    const bannerProgress = banner ? clamp01(num(banner.progress, 1)) : 0;
+    const bannerHtml =
+      banner && bannerProgress > 0.001
+        ? `
+        <div class="map__banner" style="opacity:${bannerProgress.toFixed(3)};transform:translateY(${((1 - bannerProgress) * -160).toFixed(1)}px)">
+          <span class="map__banner-icon">${ICONS.phone}</span>
+          <span class="map__banner-text">
+            <span class="map__banner-title">${esc(banner.title || '')}</span>
+            ${banner.body ? `<span class="map__banner-body">${esc(banner.body)}</span>` : ''}
+          </span>
+        </div>`
+        : '';
+
+    const chipHtml =
+      chip.value !== undefined && chip.value !== ''
+        ? `
+        <div class="map__chip" style="opacity:${clamp01(num(chip.opacity, 1)).toFixed(3)}">
+          <span class="map__chip-value">${esc(chip.value)}</span>
+          ${chip.unit ? `<span class="map__chip-unit">${esc(chip.unit)}</span>` : ''}
+        </div>`
+        : '';
+
+    const pinHtml =
+      other.label && otherOpacity > 0.001
+        ? `
+        <div class="map__pin-dot" style="left:${num(other.x, 540).toFixed(1)}px;top:${num(other.y, 720).toFixed(1)}px;opacity:${otherOpacity.toFixed(3)}"></div>
+        <div class="map__pin" style="left:${num(other.x, 540).toFixed(1)}px;top:${num(other.y, 720).toFixed(1)}px;opacity:${otherOpacity.toFixed(3)}">
+          <span class="map__pin-chip${other.flash ? ' map__pin-chip--flash' : ''}">${esc(other.label)}</span>
+        </div>`
+        : '';
+
+    const selfHtml =
+      selfOpacity > 0.001
+        ? `
+        <div class="map__accuracy" style="left:${num(self.x, 540).toFixed(1)}px;top:${num(self.y, 720).toFixed(1)}px;opacity:${(selfOpacity * 0.5).toFixed(3)};transform:translate(-50%,-50%) scale(${accuracy.toFixed(3)})"></div>
+        <div class="map__self" style="left:${num(self.x, 540).toFixed(1)}px;top:${num(self.y, 720).toFixed(1)}px;opacity:${selfOpacity.toFixed(3)}">
+          <span class="map__self-ring"></span>
+        </div>`
+        : '';
+
+    const sheetHtml = rows
+      ? `<div class="map__sheet">
+           <span class="map__sheet-head">${esc(p.sheetTitle || 'Devices')}</span>
+           ${rows}
+         </div>`
+      : '';
+
+    return `
+      <div class="map">
+        <div class="map__layer" style="transform:translate(${panX.toFixed(1)}px, ${panY.toFixed(1)}px) scale(${zoom.toFixed(4)})">
+          <svg class="map__svg" width="2160" height="2160" viewBox="0 0 2160 2160" aria-hidden="true">
+            <rect x="0" y="0" width="2160" height="2160" fill="#0c141d"></rect>
+            <rect x="330" y="1420" width="470" height="380" rx="46" fill="#0f1c16"></rect>
+            <rect x="1560" y="360" width="380" height="300" rx="38" fill="#0f1c16"></rect>
+            <path d="${geo.minor}" fill="none" stroke="#1b2834" stroke-width="4"></path>
+            <path d="${geo.alleys}" fill="none" stroke="#16212c" stroke-width="3"></path>
+            <path d="${geo.major}" fill="none" stroke="#27394c" stroke-width="12"></path>
+            <path d="M-140 2260L2300 780" fill="none" stroke="#223447" stroke-width="9"></path>
+            <path d="M-160 1520 Q 620 1270 1240 790 T 2320 190" fill="none" stroke="#2c4054" stroke-width="32" stroke-linecap="round"></path>
+            <path d="M-160 2060 Q 520 1740 1080 1810 T 2320 1400" fill="none" stroke="rgba(7,15,23,0.9)" stroke-width="180" stroke-linecap="round"></path>
+            <path d="M-160 2060 Q 520 1740 1080 1810 T 2320 1400" fill="none" stroke="rgba(28,54,74,0.55)" stroke-width="8" stroke-linecap="round"></path>
+          </svg>
+        </div>
+        <div class="map__shade"></div>
+        ${selfHtml}${pinHtml}${chipHtml}${bannerHtml}
+        ${sheetHtml}
+      </div>`;
+  }
+
   function phoneReflection(props, state) {
     // Event atFrame values are scene-local, so animate on localFrame.
     const frame = state.localFrame;
@@ -961,6 +1141,7 @@
     callView,
     hallView,
     recorder,
+    mapView,
     timerLabel,
     headlightIntensity,
   };

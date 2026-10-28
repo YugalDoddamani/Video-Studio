@@ -27,6 +27,7 @@ Six finished films ship with the repo:
 
 | Film | Length | About |
 | --- | --- | --- |
+| `28-km` | 30s | **Standalone.** Find My lists a second device called *Me*, 2.8 km away, closing. No voice-over. |
 | `it-was-you` | 30s | **Part 4, the finale.** The phone on the floor records the message that part 1 receives. Ends on part 1's first frame. |
 | `its-inside` | 30s | **Part 3.** The call from part 2 is still up, and the phone is inside the house, walking towards you. |
 | `you-answer` | 30s | Part 2: you answer a call from your own number. The camera is outside your door. |

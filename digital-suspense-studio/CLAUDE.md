@@ -16,13 +16,14 @@ changing behaviour, and read `README.md` for the commands that actually run.
 - CLI: `src/cli.js`, exposed through npm scripts.
 - Scene types: `lock-screen`, `notification`, `voice-note`, `incoming-call`,
   `message-thread`, `photo-viewer`, `signal-loss`, `video-call`, `hallway`,
-  `recorder`, `system-alert`, `street`, `reflection`, `end-card`.
+  `recorder`, `map`, `system-alert`, `street`, `reflection`, `end-card`.
 - Project-level caption track: `captions[]`, timed in **global** frames.
 - Audio: silent by default; one mixed track per project, encoded to AAC.
-- Films: `it-was-you` (30s, part 4, the finale), `its-inside` (30s, part 3),
-  `you-answer` (30s, part 2), `voicemail-from-tomorrow-30s` (30s, part 1),
-  `dont-open-the-door` (45s), `voicemail-from-tomorrow` (43s, first cut).
-- Tests: `npm test` (93 unit tests, no browser required).
+- Films: `28-km` (30s, standalone, no voice), `it-was-you` (30s, part 4, the
+  finale), `its-inside` (30s, part 3), `you-answer` (30s, part 2),
+  `voicemail-from-tomorrow-30s` (30s, part 1), `dont-open-the-door` (45s),
+  `voicemail-from-tomorrow` (43s, first cut).
+- Tests: `npm test` (102 unit tests, no browser required).
 
 Verify before you claim anything works:
 

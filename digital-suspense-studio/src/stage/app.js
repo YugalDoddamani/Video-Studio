@@ -128,6 +128,10 @@
     '.screen__caption',
     '.street__caption',
     '.caption__text',
+    '.map__chip',
+    '.map__sheet',
+    '.map__row',
+    '.map__empty',
   ];
 
   function rectOf(element) {

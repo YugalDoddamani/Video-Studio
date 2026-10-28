@@ -133,6 +133,28 @@ function config() {
       events: [],
     },
     {
+      id: 'gallery-map',
+      type: 'map',
+      data: {
+        statusTime: '9:41',
+        seed: 'gallery-map',
+        sheetTitle: 'Devices',
+        deviceModel: 'iPhone 15 Pro',
+        selfName: 'This iPhone',
+        selfMeta: 'You are here',
+        labelBefore: 'Me',
+        labelAfter: 'Asha',
+        labelAtFrame: 10,
+        selfOutAtFrame: 16,
+        zoom: [[0, 1], [18, 1.6]],
+        distance: [[0, 2800], [12, 400], [18, 3]],
+        pinX: [[0, 900], [18, 598]],
+        pinY: [[0, 600], [18, 700]],
+        banner: { title: 'Me', body: 'Arrived at your location', atFrame: 4, durationFrames: 8 },
+      },
+      events: [],
+    },
+    {
       id: 'gallery-hallway',
       type: 'hallway',
       data: {
