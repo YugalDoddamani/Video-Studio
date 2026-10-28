@@ -50,6 +50,15 @@ Independent stories that may share a surface, never a plot. A viewer must never 
   No surname, no face, no age. Other World B films may leave her unnamed; nothing may
   contradict the name.
 
+**The map world (DS-002)**
+- Status bar reads **9:41** in every map scene. It is not a plot time; do not build a
+  countdown around it.
+- The device list names her phone **This iPhone** and the intruder device **Me**, which
+  later resolves to **ASHA**. Reuse both names if the map returns in DS-006 or DS-009.
+- `No location found` is the app's empty string for a device. Do not paraphrase it.
+- The map is always correct. If a later film needs the software to be wrong, that is a
+  different mechanism and needs a different surface.
+
 **Recurring surfaces (allowed, no continuity implied)**
 - `map` — DS-002, DS-006, DS-009. Same app chrome, different addresses.
 - `photo-viewer` — DS-001, DS-014.

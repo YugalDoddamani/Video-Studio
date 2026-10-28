@@ -63,6 +63,34 @@
     return eventsByType[type] || fallback;
   }
 
+  /**
+   * Piecewise interpolation over [[frame, value], ...] keyframes.
+   *
+   * Scene data describes a map as a few points in time ("2.8 km at frame 0,
+   * 1.1 km at 100") and this turns them into a value for the current frame.
+   * The easing is per-segment, so a distance can crawl and then accelerate.
+   */
+  function keyframes(frame, keys, easing) {
+    if (!Array.isArray(keys) || keys.length === 0) return 0;
+    if (frame <= keys[0][0]) return keys[0][1];
+    for (let index = 1; index < keys.length; index += 1) {
+      const endFrame = keys[index][0];
+      if (frame <= endFrame) {
+        const startFrame = keys[index - 1][0];
+        const span = Math.max(1, endFrame - startFrame);
+        const progress = (easing || Motion.ease.inOutCubic)(clamp01((frame - startFrame) / span));
+        return keys[index - 1][1] + (keys[index][1] - keys[index - 1][1]) * progress;
+      }
+    }
+    return keys[keys.length - 1][1];
+  }
+
+  /** 2800 metres reads as "2.8 km"; 3 metres reads as "3 m". */
+  function formatDistance(metres) {
+    if (metres >= 995) return { value: (metres / 1000).toFixed(1), unit: 'km' };
+    return { value: String(Math.max(1, Math.round(metres))), unit: 'm' };
+  }
+
   // ---------------------------------------------------------------------------
   // lock-screen: the hook. Clock, date, one notification.
   // ---------------------------------------------------------------------------
@@ -667,6 +695,89 @@
   // end-card
   // ---------------------------------------------------------------------------
 
+  // ---------------------------------------------------------------------------
+  // map: a device that closes the distance on its own
+  //
+  // The map is honest and the world is not - nothing on this screen
+  // malfunctions. The distance falls because the other device is moving, not
+  // because the app is wrong.
+  // ---------------------------------------------------------------------------
+
+  function renderMap(scene, state) {
+    const data = scene.data || {};
+    const frame = state.localFrame;
+
+    if (data.empty) {
+      return `
+        <div class="stage stage--map">
+          ${Components.statusBar({ time: data.statusTime })}
+          ${Components.mapView({ empty: true, emptyTitle: data.emptyTitle, emptySub: data.emptySub })}
+          ${fictionFooter(state, { fromFrame: 8, fadeFrames: 16 })}
+        </div>`;
+    }
+
+    const zoom = keyframes(frame, data.zoom);
+    const metres = keyframes(frame, data.distance);
+    const pinX = keyframes(frame, data.pinX);
+    const pinY = keyframes(frame, data.pinY);
+    const distance = formatDistance(metres);
+    const distanceText = `${distance.value} ${distance.unit}`;
+
+    const labelAt = Number(data.labelAtFrame);
+    const flipped = Number.isFinite(labelAt) && frame >= labelAt;
+    const flash = flipped && frame < labelAt + 14;
+
+    const outAt = Number(data.selfOutAtFrame);
+    const selfOpacity = Number.isFinite(outAt) ? 1 - tween(frame, outAt, 12, Motion.ease.inOutCubic) : 1;
+    // The row must not report the loss before the dot has finished fading:
+    // this film's whole promise is that the software is honest.
+    const gone = Number.isFinite(outAt) && frame >= outAt + 12;
+
+    const bannerEvent = data.banner || null;
+    const banner = bannerEvent
+      ? {
+          title: bannerEvent.title,
+          body: bannerEvent.body,
+          progress: tween(
+            frame,
+            Number(bannerEvent.atFrame) || 0,
+            Number(bannerEvent.durationFrames) || 10,
+            Motion.ease.outCubic
+          ),
+        }
+      : null;
+
+    const rows = [
+      {
+        name: flipped ? data.labelAfter : data.labelBefore,
+        meta: data.deviceModel || 'iPhone 15 Pro',
+        dist: distanceText,
+      },
+      gone
+        ? { name: data.goneName || 'No location found', meta: data.goneMeta || 'Last updated —', tone: 'muted' }
+        : { name: data.selfName || 'This iPhone', meta: data.selfMeta || 'You are here', dist: 'now' },
+    ];
+
+    return `
+      <div class="stage stage--map">
+        ${Components.statusBar({ time: data.statusTime })}
+        ${Components.mapView({
+          seed: data.seed,
+          zoom,
+          panX: Number(data.panX) || 0,
+          panY: Number(data.panY) || 0,
+          accuracy: 1 + (1 - clamp01(metres / 2800)) * 0.4,
+          self: { x: 540, y: 720, opacity: selfOpacity },
+          other: { x: pinX, y: pinY, label: flipped ? data.labelAfter : data.labelBefore, flash },
+          chip: { value: distance.value, unit: distance.unit },
+          banner,
+          rows,
+          sheetTitle: data.sheetTitle,
+        })}
+        ${fictionFooter(state, { fromFrame: 8, fadeFrames: 16 })}
+      </div>`;
+  }
+
   function renderEndCard(scene, state) {
     const data = scene.data;
     // "Cut to black on the third knock": hold the frame at true backdrop for
@@ -724,6 +835,7 @@
     'video-call': { render: renderVideoCall, label: 'Answered video call - camera feed and self-view' },
     hallway: { render: renderHallway, label: 'Interior corridor feed - someone at the far end' },
     recorder: { render: renderRecorder, label: 'Voicemail being recorded - timer and level meter' },
+    map: { render: renderMap, label: 'Map with device pins closing in' },
     'system-alert': { render: renderSystemAlert, label: 'System alert' },
     street: { render: renderStreet, label: 'Rainy street insert' },
     reflection: { render: renderReflection, label: 'Mirror / doorway reveal' },

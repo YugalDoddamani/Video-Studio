@@ -304,6 +304,49 @@ message that arrives tomorrow is being left today.
 The timer counts in tenths, the 56 bars are seeded per project and modulated by
 the frame number, so the meter moves but a re-render is byte-identical.
 
+### map
+
+A night map with device pins and a device sheet — the Find My surface, drawn
+instead of fetched.
+
+```json
+"data": {
+  "statusTime": "9:41", "seed": "28km", "sheetTitle": "Devices",
+  "deviceModel": "iPhone 15 Pro", "selfName": "This iPhone", "selfMeta": "You are here",
+  "labelBefore": "Me", "labelAfter": "Asha", "labelAtFrame": 240, "selfOutAtFrame": 345,
+  "zoom": [[0, 1.12], [230, 1.85]],
+  "distance": [[0, 400], [120, 3]],
+  "pinX": [[0, 735], [120, 598]], "pinY": [[0, 685], [120, 700]],
+  "banner": { "title": "Me", "body": "Arrived at your location", "atFrame": 300, "durationFrames": 12 }
+}
+```
+
+`zoom`, `distance`, `pinX` and `pinY` are `[[frame, value], ...]` keyframe lists,
+interpolated by the scene's `keyframes()` helper with `inOutCubic` per segment.
+Distances are in metres and format themselves: 2800 reads as `2.8 km`, 3 reads as `3 m`,
+so a countdown from "400 m" to "3 m" is one list rather than a stack of cards.
+
+Three rules keep the surface honest:
+
+- **Pins live in screen space.** They are positioned by the scene, not by the zoom
+  transform, because the point of the scene is a device crossing the frame while the
+  city expands under it.
+- **The zoom is anchored on her dot** at (540, 720) via `transform-origin`, so the
+  streets grow around her and she never moves.
+- **The map never malfunctions.** Every number on screen is correct for what it is
+  tracking; the impossibility belongs to the world, not the software.
+
+Street geometry is generated once per `seed` (`mapGeometry`) from the same PRNG the
+rest of the stage uses and cached, so a re-render is byte-identical. `empty: true`
+drops the streets and pins for the closing state and renders `No devices found`.
+
+The pin label resolving is a frame-accurate class swap (`map__pin-chip--flash`), not a
+CSS animation — animations run on the wall clock and would break determinism.
+
+`.map__chip`, `.map__sheet`, `.map__row` and `.map__empty` are in the layout
+inspector's checked set, so their text is verified against the safe area on every
+`preview` and `check`.
+
 ### Adding a scene type
 
 1. Write a `renderX(scene, state)` function in `src/stage/scenes.js`.
