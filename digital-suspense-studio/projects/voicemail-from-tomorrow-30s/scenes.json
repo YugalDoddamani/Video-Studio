@@ -1,0 +1,258 @@
+{
+  "title": "Voicemail from Tomorrow",
+  "slug": "voicemail-from-tomorrow-30s",
+  "cut": "30s revision",
+  "fictional": true,
+  "fictionLabel": "FICTIONAL STORY",
+  "description": "A voicemail arrives timestamped 6:47 AM tomorrow. It is your own voice, and it is warning you about the knock at nine.",
+  "format": {
+    "width": 1080,
+    "height": 1920,
+    "fps": 30
+  },
+  "audio": {
+    "mode": "local",
+    "tracks": [
+      {
+        "file": "audio/mix.wav",
+        "role": "mix",
+        "source": "synthesized score (chime, static, ringtone, knocks, room tone) + processed voice-over",
+        "note": "assembled by audio/build-audio.sh from the seven vo-*.mp3 takes in this folder"
+      }
+    ]
+  },
+  "captions": [
+    {
+      "text": "this voicemail is from TOMORROW",
+      "atFrame": 0,
+      "durationFrames": 84
+    },
+    {
+      "text": "that's your own voice",
+      "atFrame": 84,
+      "durationFrames": 71
+    },
+    {
+      "text": "tomorrow already happened.",
+      "atFrame": 155,
+      "durationFrames": 129
+    },
+    {
+      "text": "3 KNOCKS. 9PM.",
+      "atFrame": 284,
+      "durationFrames": 126
+    },
+    {
+      "text": "you know who it is.",
+      "atFrame": 410,
+      "durationFrames": 123
+    },
+    {
+      "text": "last time, you opened it",
+      "atFrame": 533,
+      "durationFrames": 74
+    },
+    {
+      "text": "calling from…",
+      "atFrame": 607,
+      "durationFrames": 59
+    },
+    {
+      "text": "tomorrow.",
+      "atFrame": 666,
+      "durationFrames": 60
+    },
+    {
+      "text": "it's almost 9.",
+      "atFrame": 726,
+      "durationFrames": 78
+    }
+  ],
+  "scenes": [
+    {
+      "id": "scene-01-hook",
+      "type": "lock-screen",
+      "startFrame": 0,
+      "durationFrames": 90,
+      "data": {
+        "statusTime": "8:47",
+        "time": "8:47",
+        "dateLabel": "Thursday, 12 June",
+        "appLabel": "VOICEMAIL",
+        "title": "Voicemail",
+        "body": "received TOMORROW, 6:47 AM",
+        "highlight": "TOMORROW",
+        "when": "now",
+        "darkRoom": true,
+        "wake": {
+          "atFrame": -16,
+          "durationFrames": 26
+        }
+      },
+      "events": [
+        {
+          "type": "show-notification",
+          "atFrame": 0,
+          "durationFrames": 10
+        },
+        {
+          "type": "highlight-timestamp",
+          "atFrame": 0,
+          "durationFrames": 8
+        }
+      ]
+    },
+    {
+      "id": "scene-02-voicemail",
+      "type": "voice-note",
+      "startFrame": 90,
+      "durationFrames": 540,
+      "transition": {
+        "type": "fade",
+        "durationFrames": 8
+      },
+      "data": {
+        "statusTime": "8:47",
+        "headerTitle": "VOICEMAIL",
+        "headerSubtitle": "Playing",
+        "sender": "Me",
+        "subtitle": "your number · 6:47 AM",
+        "highlight": "your number",
+        "durationLabel": "0:18",
+        "avatarInitials": "ME",
+        "bars": 56,
+        "waveHeight": 96,
+        "seed": "voicemail-from-tomorrow-30s",
+        "transcriptLabel": "TRANSCRIPT",
+        "transcript": {
+          "revealFrames": 34,
+          "lineStaggerFrames": 96,
+          "window": 2,
+          "lines": [
+            {
+              "text": "Hey... it's me.",
+              "revealAtFrame": 6
+            },
+            {
+              "text": "If you're hearing this... tomorrow already happened.",
+              "revealAtFrame": 77
+            },
+            {
+              "text": "Tonight at 9, there's a knock. Three knocks.",
+              "revealAtFrame": 206
+            },
+            {
+              "text": "Don't open it. You already know who it is.",
+              "revealAtFrame": 332
+            },
+            {
+              "text": "Last time... I opened it.",
+              "revealAtFrame": 455
+            },
+            {
+              "text": "That's why I'm calling from—",
+              "revealAtFrame": 529
+            }
+          ]
+        }
+      },
+      "events": [
+        {
+          "type": "start-playback",
+          "atFrame": 0,
+          "durationFrames": 540
+        },
+        {
+          "type": "show-transcript",
+          "atFrame": 0,
+          "durationFrames": 8
+        }
+      ]
+    },
+    {
+      "id": "scene-03-signal-loss",
+      "type": "signal-loss",
+      "startFrame": 630,
+      "durationFrames": 90,
+      "data": {
+        "statusTime": "8:47",
+        "headerTitle": "VOICEMAIL",
+        "headerSubtitle": "Playing",
+        "sender": "Me",
+        "subtitle": "your number · 6:47 AM",
+        "durationLabel": "0:18",
+        "avatarInitials": "ME",
+        "bars": 56,
+        "waveHeight": 96,
+        "seed": "voicemail-from-tomorrow-static",
+        "progress": 0.965,
+        "voicemailFrames": 540,
+        "transcript": {
+          "revealFrames": 6,
+          "window": 1,
+          "lines": [
+            {
+              "text": "That's why I'm calling from—",
+              "revealAtFrame": 2
+            }
+          ]
+        },
+        "loss": {
+          "atFrame": 3,
+          "tearFrames": 20,
+          "snowAtFrame": 14,
+          "snowFrames": 20,
+          "blackFrames": 6
+        }
+      },
+      "events": []
+    },
+    {
+      "id": "scene-04-call",
+      "type": "incoming-call",
+      "startFrame": 720,
+      "durationFrames": 90,
+      "data": {
+        "statusTime": "8:59",
+        "caller": "ME",
+        "subtitle": "your number",
+        "avatarInitials": "ME",
+        "callState": "incoming",
+        "pulsePeriodFrames": 42
+      },
+      "events": [
+        {
+          "type": "incoming-call",
+          "atFrame": 0,
+          "durationFrames": 10
+        }
+      ]
+    },
+    {
+      "id": "scene-05-end",
+      "type": "end-card",
+      "startFrame": 810,
+      "durationFrames": 90,
+      "data": {
+        "blackoutFrames": 40,
+        "ruleAtFrame": 40,
+        "lines": [
+          {
+            "text": "PART 2: you answer.",
+            "atFrame": 44,
+            "revealFrames": 10
+          },
+          {
+            "text": "would you open the door?",
+            "atFrame": 50,
+            "accent": true,
+            "revealFrames": 10
+          }
+        ],
+        "arrow": true,
+        "arrowAtFrame": 60
+      },
+      "events": []
+    }
+  ]
+}

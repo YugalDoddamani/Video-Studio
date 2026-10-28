@@ -15,9 +15,13 @@ changing behaviour, and read `README.md` for the commands that actually run.
 - Renderer: `src/stage/` (browser, no build step) + `src/lib/` (Node).
 - CLI: `src/cli.js`, exposed through npm scripts.
 - Scene types: `lock-screen`, `notification`, `voice-note`, `incoming-call`,
-  `message-thread`, `system-alert`, `street`, `reflection`, `end-card`.
-- A finished example: `projects/voicemail-from-tomorrow/` (43s, silent).
-- Tests: `npm test` (34 unit tests, no browser required).
+  `message-thread`, `photo-viewer`, `signal-loss`, `system-alert`, `street`,
+  `reflection`, `end-card`.
+- Project-level caption track: `captions[]`, timed in **global** frames.
+- Audio: silent by default; one mixed track per project, encoded to AAC.
+- Films: `voicemail-from-tomorrow-30s` (30s, current cut, sound on),
+  `dont-open-the-door` (45s), `voicemail-from-tomorrow` (43s, first cut).
+- Tests: `npm test` (62 unit tests, no browser required).
 
 Verify before you claim anything works:
 
@@ -46,7 +50,22 @@ When the user says "create a video", "create today's video", or similar:
 9. Report output paths, duration, checks performed, and limitations.
 
 Only mark a topic as completed in `topics.md` after the final video has been
-encoded and verified.
+encoded and verified. A revision of a shipped film gets its own project folder
+(with a `-30s` / `-v2` suffix) — never overwrite a rendered project, so the old
+cut stays available for comparison.
+
+## Revision work
+
+When the user sends a written revision spec (beat sheet, caption rules, audio
+design), treat the numbers in it as the contract:
+
+- Convert its timecodes to frames at 30 fps and check the totals add up.
+- Where the spec contradicts itself (a 5-word caption rule next to a 6-word
+  example), follow the rule and say so in `story.md`.
+- Capture the mix in a script under `projects/<slug>/audio/` so it can be
+  rebuilt, and measure levels rather than trusting generator defaults.
+- Put the honest unknowns in the report: a mix that was measured but never
+  auditioned is not a finished mix.
 
 ## Creative defaults
 

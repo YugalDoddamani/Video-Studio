@@ -101,6 +101,24 @@ function config() {
       events: [{ type: 'photo-received', atFrame: 6, durationFrames: 18 }],
     },
     {
+      id: 'gallery-signal-loss',
+      type: 'signal-loss',
+      data: {
+        headerTitle: 'VOICEMAIL',
+        headerSubtitle: 'Playing',
+        sender: 'Me',
+        subtitle: 'your number · 6:47 AM',
+        durationLabel: '0:18',
+        avatarInitials: 'ME',
+        progress: 0.965,
+        voicemailFrames: 540,
+        seed: 'gallery-static',
+        transcript: { revealFrames: 4, window: 1, lines: [{ text: 'That\u2019s why I\u2019m calling from\u2014', revealAtFrame: 0 }] },
+        loss: { atFrame: 0, tearFrames: 10, snowAtFrame: 8, snowFrames: 10, blackFrames: 0 },
+      },
+      events: [],
+    },
+    {
       id: 'gallery-alert',
       type: 'system-alert',
       data: {

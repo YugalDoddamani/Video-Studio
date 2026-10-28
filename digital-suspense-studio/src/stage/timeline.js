@@ -84,9 +84,28 @@
 
     const totalFrames = scenes.reduce((max, scene) => Math.max(max, scene.startFrame + scene.durationFrames), 0);
 
+    // Captions are a project-level layer, not a scene property: they are timed
+    // against the global timeline so a single card can straddle a scene change
+    // (the "calling from…" card runs from the player straight into the static).
+    const captions = (Array.isArray(raw.captions) ? raw.captions : []).map((caption, index) => {
+      const source = caption && typeof caption === 'object' ? caption : { text: String(caption || '') };
+      const atFrame = Number.isFinite(Number(source.atFrame)) ? Math.max(0, Math.round(Number(source.atFrame))) : 0;
+      const durationFrames = positiveInt(source.durationFrames, 0);
+      return {
+        text: String(source.text || ''),
+        atFrame,
+        durationFrames,
+        endFrame: atFrame + durationFrames,
+        fadeFrames: positiveInt(source.fadeFrames, 5),
+        _index: index,
+      };
+    });
+
     return {
       title: raw.title || 'Untitled',
       slug: raw.slug || slugify(raw.title || 'untitled'),
+      cut: raw.cut || '',
+      captions,
       fictional: raw.fictional !== false,
       fictionLabel: raw.fictionLabel || 'FICTIONAL STORY',
       description: raw.description || '',

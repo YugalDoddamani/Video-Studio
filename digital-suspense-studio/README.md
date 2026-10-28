@@ -19,16 +19,17 @@ topic → story.md → scenes.json → frames → final.mp4
 cd digital-suspense-studio
 npm install
 npm run doctor                              # confirm Node, FFmpeg, Chromium
-npm run preview -- dont-open-the-door       # sampled frames + contact sheet
-npm run build   -- dont-open-the-door       # render + encode + verify
+npm run preview -- voicemail-from-tomorrow-30s   # sampled frames + contact sheet
+npm run build   -- voicemail-from-tomorrow-30s   # render + encode + verify
 ```
 
 Two finished films ship with the repo:
 
 | Film | Length | About |
 | --- | --- | --- |
-| `voicemail-from-tomorrow` | 43s | A woman gets a voicemail from her own number, dated tomorrow. |
+| `voicemail-from-tomorrow-30s` | 30s | **Current cut.** A voicemail from your own voice, dated tomorrow. Sound on. |
 | `dont-open-the-door` | 45s | A text from her own number arrives with a photo of her, taken from across the room. |
+| `voicemail-from-tomorrow` | 43s | The first cut of the same story, kept for comparison. Silent. |
 
 Output lands in `projects/<slug>/`:
 
@@ -154,24 +155,39 @@ Rows in a `message-thread` can be bubbles, time separators, or system rows:
 { "kind": "system", "text": "Missed call · your number", "icon": "call", "atFrame": 128 }
 ```
 
+A caption track sits beside `scenes`, timed in **global** frames so one card can
+survive a scene change:
+
+```json
+"captions": [
+  { "text": "this voicemail is from TOMORROW", "atFrame": 0, "durationFrames": 84 },
+  { "text": "3 KNOCKS. 9PM.", "atFrame": 284, "durationFrames": 126 }
+]
+```
+
+Caps and numbers are tinted automatically (`TOMORROW`, `3 KNOCKS`, `9PM`) and
+everything else stays quiet. `npm run check` warns when a card runs longer than
+five words, overlaps the next card, or simply transcribes a line of dialogue.
+
 `npm run check` validates the file before a render: unknown scene types, zero
-durations, duplicate ids, events past the end of a scene, and missing audio files
-all fail loudly with the field name.
+durations, duplicate ids, events past the end of a scene, captions that break the
+rules above, and missing audio files all fail loudly with the field name.
 
 ### Scene types
 
 | Type | Renders |
 | --- | --- |
-| `lock-screen` | Clock, date, and a notification that should not exist |
+| `lock-screen` | Clock, date, and a notification that should not exist (optionally in a dark room that wakes up) |
 | `notification` | A notification card, optionally with a system alert |
 | `voice-note` | Voicemail player: waveform, timer, word-by-word transcript |
 | `incoming-call` | Caller, pulsing rings, accept / decline |
 | `message-thread` | Chat bubbles, time separators, system rows, attachments, typing |
-| `system-alert` | In-story warning or confirmation |
 | `photo-viewer` | A photo opened full screen out of a conversation |
+| `signal-loss` | A dying phone: torn bands, seeded static, hard cut to black |
+| `system-alert` | In-story warning or confirmation |
 | `street` | Rain on glass, a parked car, headlights igniting |
 | `reflection` | A dark phone screen reflecting a doorway that opens |
-| `end-card` | Final line, accent line, fiction label |
+| `end-card` | Final line, accent line, optional blackout and CTA arrow |
 
 ---
 
@@ -191,6 +207,13 @@ Audio is optional and off by default. A project renders silent unless
 `audio.tracks` lists a local file that exists, in which case it is mixed in as
 AAC. The pipeline never assumes TTS, music, or a cloud service is available, and
 `render-report.json` always records whether the result has audio.
+
+`voicemail-from-tomorrow-30s` shows the whole path: seven text-to-speech takes
+are pitched down, banded and doubled, then mixed with a synthesized score by
+`audio/build-audio.sh`. Every element is scaled until its *measured* peak or
+mean hits a stated target, because FFmpeg builds disagree about how loud a
+generator is. The script prints the level of every window it cares about and
+fails if the loudest moment is not where the film needs it.
 
 ---
 

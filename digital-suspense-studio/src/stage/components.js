@@ -323,7 +323,18 @@
     const frame = frameOf(state);
     const lines = props.lines || [];
     if (!lines.length) return '';
-    const html = lines
+
+    // A windowed transcript keeps only the lines that have started. The card
+    // has a fixed height and stacks from the bottom, so a new line pushes the
+    // previous one up instead of resizing the player mid-sentence.
+    const windowSize = num(props.window, 0);
+    const started = lines.filter((line) => {
+      const first = line.words && line.words[0];
+      return frame >= (first ? first.startFrame : 0);
+    });
+    const visible = windowSize > 0 ? started.slice(-windowSize) : lines;
+
+    const html = visible
       .map((line) => {
         const words = line.words
           .map((entry) => {
@@ -335,9 +346,9 @@
       })
       .join('');
     return `
-      <div class="transcript">
+      <div class="transcript${windowSize > 0 ? ' transcript--window' : ''}">
         <div class="transcript__label">${esc(props.label || 'TRANSCRIPT')}</div>
-        ${html}
+        <div class="transcript__lines">${html}</div>
       </div>`;
   }
 
@@ -360,7 +371,7 @@
             <span class="wave__total">${esc(durationLabel)}</span>
           </div>
         </div>
-        ${transcript({ lines: props.lines, label: props.transcriptLabel }, state)}
+        ${transcript({ lines: props.lines, label: props.transcriptLabel, window: props.window }, state)}
       </div>`;
   }
 
@@ -403,12 +414,79 @@
         return `<p class="endcard__line${accent}" style="opacity:${progress.toFixed(3)};transform:translateY(${((1 - progress) * 20).toFixed(1)}px)">${esc(line.text)}</p>`;
       })
       .join('');
+    // The spec ends on a comment-bait arrow. It is drawn as a vector because
+    // the stage ships Inter only - there is no emoji font to fall back on, so
+    // "👇" would render as a tofu box on every machine.
+    const arrow = props.arrow
+      ? `<div class="endcard__arrow" style="opacity:${tween(frame, num(props.arrowAtFrame, 40), 10, Motion.ease.outCubic).toFixed(3)}">
+           <svg width="54" height="54" viewBox="0 0 54 54" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+             <path d="M27 10v30"/><path d="M14 28l13 13 13-13"/>
+           </svg>
+         </div>`
+      : '';
     return `
       <div class="endcard">
-        <div class="endcard__rule" style="opacity:${tween(frame, 0, 14).toFixed(3)}"></div>
+        <div class="endcard__rule" style="opacity:${tween(frame, num(props.ruleAtFrame, 0), 14).toFixed(3)}"></div>
         ${html}
         ${props.followPrompt ? `<p class="endcard__follow">${esc(props.followPrompt)}</p>` : ''}
+        ${arrow}
       </div>`;
+  }
+
+  // ---------------------------------------------------------------------------
+  // CaptionLayer
+  // ---------------------------------------------------------------------------
+
+  /**
+   * Tokens that earn the threat colour: an all-caps word, or anything carrying
+   * a digit ("3", "9PM"). Every other word stays lowercase, because the spec
+   * keeps quiet text quiet and spends colour only on the threat.
+   */
+  function isHotToken(token) {
+    const bare = token.replace(/[^\p{L}\p{N}']/gu, '');
+    if (!bare) return false;
+    if (/\d/.test(bare)) return true;
+    return /^[A-Z]{2,}$/.test(bare);
+  }
+
+  function captionText(text) {
+    return String(text || '')
+      .split(/\s+/)
+      .filter(Boolean)
+      .map((token) => (isHotToken(token) ? `<span class="caption__hot">${esc(token)}</span>` : esc(token)))
+      .join(' ');
+  }
+
+  /**
+   * The caption layer is a second narrator.
+   *
+   * It is timed on the GLOBAL frame, not the scene-local one, so one card can
+   * survive a scene cut (the "calling from…" card runs out of the player and
+   * straight into the static). Only cards that are live this frame render, and
+   * two live cards cross-fade instead of popping.
+   */
+  function captionLayer(captions, frame) {
+    const list = Array.isArray(captions) ? captions : [];
+    const active = list.filter((caption) => frame >= caption.atFrame && frame < caption.endFrame);
+    if (!active.length) return '';
+    const cards = active
+      .map((caption) => {
+        const local = frame - caption.atFrame;
+        const remaining = caption.endFrame - frame;
+        const fade = Math.max(1, num(caption.fadeFrames, 5));
+        // A card that opens the film is already on screen in frame 1: the hook
+        // has to be readable in the frame a feed shows as the thumbnail.
+        const entering = caption.atFrame === 0 ? 1 : clamp01(local / fade);
+        const leaving = clamp01(remaining / fade);
+        const opacity = Math.min(entering, leaving);
+        const lift = (1 - Motion.ease.outCubic(entering)) * 16;
+        return `<div class="caption" style="opacity:${opacity.toFixed(3)};transform:translateY(${lift.toFixed(1)}px)">
+          <span class="caption__scrim"></span>
+          <p class="caption__text">${captionText(caption.text)}</p>
+        </div>`;
+      })
+      .join('');
+    return `<div class="captions" data-live="${active.length}">${cards}</div>`;
   }
 
   // ---------------------------------------------------------------------------
@@ -663,6 +741,9 @@
   const Components = {
     esc,
     ICONS,
+    captionLayer,
+    captionText,
+    isHotToken,
     statusBar,
     appHeader,
     notificationCard,

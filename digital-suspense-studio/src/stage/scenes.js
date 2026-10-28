@@ -26,15 +26,25 @@
   // shared scaffolding
   // ---------------------------------------------------------------------------
 
-  /** Full-screen phone surface: backdrop, status bar, optional header. */
+  /**
+   * Full-screen phone surface: backdrop, status bar, optional header.
+   *
+   * `layer` paints between the backdrop and the chrome (the dark room behind a
+   * sleeping phone). `wake` dims the whole chrome at once, which is how a phone
+   * screen coming on is staged.
+   */
   function screen(options) {
-    const { inner, statusTime, header, headerTitle, headerSubtitle, headerVariant, extraClass } = options;
+    const { inner, statusTime, header, headerTitle, headerSubtitle, headerVariant, extraClass, layer, wake } = options;
+    const headerHtml =
+      header === false ? '' : header || (headerTitle ? Components.appHeader(headerTitle, headerSubtitle, headerVariant) : '');
+    const chrome = `${Components.statusBar({ time: statusTime })}${headerHtml}${inner}`;
+    const body =
+      wake === undefined ? chrome : `<div class="wake" style="opacity:${Number(wake).toFixed(3)}">${chrome}</div>`;
     return `
       <div class="stage ${extraClass || ''}">
         <div class="backdrop"></div>
-        ${Components.statusBar({ time: statusTime })}
-        ${header === false ? '' : header || (headerTitle ? Components.appHeader(headerTitle, headerSubtitle, headerVariant) : '')}
-        ${inner}
+        ${layer || ''}
+        ${body}
         <div class="vignette"></div>
       </div>`;
   }
@@ -66,24 +76,56 @@
     });
     // outBack overshoots past 1, which is right for scale but not for opacity.
     const notifRaw = tween(frame, notifEvent.atFrame, notifEvent.durationFrames, Motion.ease.outBack);
-    const notifProgress = clamp01(notifRaw);
+    // A card scheduled for frame 0 is not an entrance: the film joins the story
+    // with the notification already on the glass, so frame 1 is the impossible
+    // image rather than an empty lock screen. Anything later keeps its spring.
+    const notifProgress = notifEvent.atFrame === 0 ? 1 : clamp01(notifRaw);
     const highlightEvent = eventAt(state.eventsByType, 'highlight-timestamp', {
       atFrame: notifEvent.atFrame + notifEvent.durationFrames + 8,
       durationFrames: 18,
     });
-    const highlightProgress = tween(frame, highlightEvent.atFrame, highlightEvent.durationFrames);
-    const clockOpacity = tween(frame, 0, 12);
-    const glow = 0.14 + 0.1 * Motion.pulse(frame, 62, 0) * notifProgress;
+    // Same rule as the card: a highlight scheduled for frame 0 is already lit.
+    // The token replaces the word in the body, so fading it in would leave
+    // "received , 6:47 AM" on screen for the first quarter of a second.
+    const highlightProgress = highlightEvent.atFrame === 0
+      ? 1
+      : tween(frame, highlightEvent.atFrame, highlightEvent.durationFrames);
+    const pulseGlow = 0.14 + 0.1 * Motion.pulse(frame, 62, 0) * notifProgress;
+
+    // Hook staging: the room is real, the phone is asleep, and the screen is
+    // what wakes it. With darkRoom the chrome fades up instead of hard-cutting
+    // in, and a near-black room layer sits underneath.
+    const wakeEvent = data.wake || { atFrame: 0, durationFrames: 16 };
+    const wake = data.darkRoom
+      ? tween(frame, Number(wakeEvent.atFrame) || 0, Number(wakeEvent.durationFrames) || 16, Motion.ease.outCubic)
+      : undefined;
+    // The clock rides the wake: on a dark-room shot it is already there at
+    // frame 1, dim with the screen, rather than fading up out of nothing.
+    const clockOpacity = Math.max(tween(frame, 0, 12), wake || 0);
+    const room = data.darkRoom
+      ? `<div class="room">
+           <div class="room__wall"></div>
+           <div class="room__window"></div>
+           <div class="room__door"></div>
+           <div class="room__floor"></div>
+           <div class="room__glow" style="opacity:${(0.18 + wake * 0.82).toFixed(3)}"></div>
+           <div class="room__dim" style="opacity:${(0.88 - wake * 0.68).toFixed(3)}"></div>
+         </div>`
+      : '';
+    const glowOpacity = 0.14 + 0.1 * Motion.pulse(frame, 62, 0) * notifProgress;
 
     return screen({
       statusTime: data.statusTime || data.time || '8:14',
+      extraClass: data.darkRoom ? 'stage--room' : '',
+      layer: room,
+      wake,
       inner: `
         <div class="lock">
           <div class="lock__clock-group" style="opacity:${clockOpacity.toFixed(3)}">
             <div class="lock__time">${Components.esc(data.time || '8:14')}</div>
             <div class="lock__date">${Components.esc(data.dateLabel || '')}</div>
           </div>
-          <div class="lock__glow" style="opacity:${glow.toFixed(3)}"></div>
+          <div class="lock__glow" style="opacity:${glowOpacity.toFixed(3)}"></div>
           <div class="lock__notif">
             ${Components.notificationCard({
               appLabel: data.appLabel || 'VOICEMAIL',
@@ -206,6 +248,7 @@
             durationFrames: playbackEvent.durationFrames,
             lines: buildTranscriptLines(scene, state),
             transcriptLabel: data.transcriptLabel || 'TRANSCRIPT',
+            window: Number((scene.data.transcript || {}).window) || 0,
           }, state)}
           ${fictionFooter(state, { fromFrame: 10 })}
         </div>`,
@@ -332,6 +375,114 @@
   }
 
   // ---------------------------------------------------------------------------
+  // signal-loss: the phone dies while the message is still playing.
+  // ---------------------------------------------------------------------------
+
+  /**
+   * The picture tears, the sound is cut off mid-word, and the caption finishes
+   * the sentence the audio could not. Everything here is derived from the frame
+   * number and a seed, so a re-render produces byte-identical static.
+   */
+  function renderSignalLoss(scene, state) {
+    const data = scene.data;
+    const frame = state.localFrame;
+    const duration = state.durationFrames;
+    const loss = data.loss || {};
+
+    const atFrame = Math.max(0, Math.round(Number(loss.atFrame) || 3));
+    const tearFrames = Math.max(1, Math.round(Number(loss.tearFrames) || 20));
+    const snowAtFrame = Math.round(Number(loss.snowAtFrame) || 16);
+    const snowFrames = Math.max(1, Math.round(Number(loss.snowFrames) || 18));
+    const blackFrames = Math.max(0, Math.round(Number(loss.blackFrames) || 6));
+
+    const tear = tween(frame, atFrame, tearFrames, Motion.ease.inCubic);
+    const snow = tween(frame, snowAtFrame, snowFrames, Motion.ease.outCubic);
+    // A hard cut, not a dim: the screen dies on a frame boundary.
+    const black = blackFrames && frame >= duration - blackFrames ? 1 : 0;
+
+    // A fresh stream of noise every frame, seeded by frame number.
+    const random = Motion.mulberry32(Motion.hashString(`${data.seed || scene.id}:${frame}`));
+
+    const jitterX = (random() * 2 - 1) * 30 * tear;
+    const jitterY = (random() * 2 - 1) * 9 * tear;
+
+    // Slices of the picture, displaced sideways as the signal degrades.
+    const bands = [];
+    for (let i = 0; i < 20; i += 1) {
+      const top = random() * 1920;
+      const height = 10 + random() * 62;
+      const dx = (random() * 2 - 1) * 210 * tear;
+      const opacity = (0.22 + random() * 0.58) * tear;
+      bands.push(
+        `<span class="loss__band" style="top:${top.toFixed(0)}px;height:${height.toFixed(0)}px;transform:translateX(${dx.toFixed(0)}px);opacity:${opacity.toFixed(3)}"></span>`
+      );
+    }
+
+    // Snow. Short bright dashes read as signal noise at 1080x1920 far better
+    // than a full-frame noise texture, and cost one element each.
+    const specks = [];
+    for (let i = 0; i < 170; i += 1) {
+      const left = random() * 1080;
+      const top = random() * 1920;
+      const width = 14 + random() * 190;
+      const height = 2 + random() * 5;
+      const opacity = 0.06 + random() * 0.85;
+      specks.push(
+        `<span class="loss__speck" style="left:${left.toFixed(0)}px;top:${top.toFixed(0)}px;width:${width.toFixed(0)}px;height:${height.toFixed(1)}px;opacity:${opacity.toFixed(3)}"></span>`
+      );
+    }
+
+    const flash = Math.max(0, 1 - Math.abs(frame - (snowAtFrame + 2)) / 3) * 0.5;
+    const pictureOpacity = clamp01(1 - snow * 1.15);
+
+    const picture = `
+      <div class="loss__picture" style="opacity:${pictureOpacity.toFixed(3)};transform:translate(${jitterX.toFixed(1)}px, ${jitterY.toFixed(1)}px)">
+        ${Components.statusBar({ time: data.statusTime || '8:47' })}
+        ${Components.appHeader(data.headerTitle || 'VOICEMAIL', data.headerSubtitle || 'Playing')}
+        <div class="screen screen--player">
+          ${Components.voiceNote(
+            {
+              avatarInitials: data.avatarInitials || 'ME',
+              sender: data.sender || 'Me',
+              subtitle: data.subtitle || '',
+              highlight: data.highlight,
+              durationLabel: data.durationLabel || '0:18',
+              bars: data.bars || 56,
+              waveHeight: data.waveHeight || 124,
+              seed: data.seed || scene.id,
+              progress: Number(data.progress) || 0.96,
+              durationFrames: Number(data.voicemailFrames) || 540,
+              lines: buildTranscriptLines(scene, state),
+              transcriptLabel: data.transcriptLabel || 'TRANSCRIPT',
+              window: Number((data.transcript || {}).window) || 0,
+            },
+            state
+          )}
+        </div>
+      </div>`;
+
+    return `
+      <div class="stage stage--loss">
+        <div class="backdrop"></div>
+        ${picture}
+        <div class="loss__tear">${bands.join('')}</div>
+        <div class="loss__snow" style="opacity:${snow.toFixed(3)}">
+          ${specks.join('')}
+          <div class="loss__scanlines"></div>
+          <div class="loss__flash" style="opacity:${flash.toFixed(3)}"></div>
+        </div>
+        <div class="loss__black" style="opacity:${clamp01(black).toFixed(3)}"></div>
+        <div class="fiction-wrap">
+          ${Components.fictionLabel({
+            text: state.config.fictionLabel,
+            opacity: tween(state.localFrame, 6, 14, Motion.ease.outCubic),
+          })}
+        </div>
+        <div class="vignette"></div>
+      </div>`;
+  }
+
+  // ---------------------------------------------------------------------------
   // street / reflection (scene extensions)
   // ---------------------------------------------------------------------------
 
@@ -358,13 +509,36 @@
 
   function renderEndCard(scene, state) {
     const data = scene.data;
+    // "Cut to black on the third knock": hold the frame at true backdrop for
+    // the first N frames so the knocks land on nothing at all.
+    const blackoutFrames = Math.max(0, Math.round(Number(data.blackoutFrames) || 0));
+    if (blackoutFrames && state.localFrame < blackoutFrames) {
+      // No backdrop: a cut to black has to be black, not the house gradient.
+      // The disclosure still arrives — it is a promise, not a decoration.
+      return `<div class="stage stage--endcard">
+        ${fictionFooter(state, { fromFrame: 16, fadeFrames: 16 })}
+      </div>`;
+    }
+    // ...and the room comes back up as the card arrives.
+    const backdropOpacity = blackoutFrames
+      ? tween(state.localFrame, blackoutFrames, 10, Motion.ease.outCubic)
+      : 1;
     const zoom = 1 + (state.localFrame / Math.max(1, state.durationFrames)) * 0.02;
     const glow = 0.12 + 0.06 * Motion.pulse(state.localFrame, 90, 0);
     return `
       <div class="stage stage--endcard">
-        <div class="backdrop"></div>
+        <div class="backdrop" style="opacity:${backdropOpacity.toFixed(3)}"></div>
         <div class="endcard__glow" style="opacity:${glow.toFixed(3)};transform:translateX(-50%) scale(${zoom.toFixed(4)})"></div>
-        ${Components.endCard({ lines: data.lines || [], followPrompt: data.followPrompt }, state)}
+        ${Components.endCard(
+          {
+            lines: data.lines || [],
+            followPrompt: data.followPrompt,
+            ruleAtFrame: data.ruleAtFrame,
+            arrow: data.arrow === true,
+            arrowAtFrame: data.arrowAtFrame,
+          },
+          state
+        )}
         <div class="fiction-wrap">
           ${Components.fictionLabel({
             text: state.config.fictionLabel,
@@ -386,6 +560,7 @@
     'incoming-call': { render: renderIncomingCall, label: 'Incoming call screen' },
     'message-thread': { render: renderMessageThread, label: 'Message conversation' },
     'photo-viewer': { render: renderPhotoViewer, label: 'Photo opened from a conversation' },
+    'signal-loss': { render: renderSignalLoss, label: 'Phone dying - torn signal and static' },
     'system-alert': { render: renderSystemAlert, label: 'System alert' },
     street: { render: renderStreet, label: 'Rainy street insert' },
     reflection: { render: renderReflection, label: 'Mirror / doorway reveal' },
