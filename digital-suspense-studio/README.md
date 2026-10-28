@@ -27,7 +27,8 @@ Six finished films ship with the repo:
 
 | Film | Length | About |
 | --- | --- | --- |
-| `28-km-60s` | 60s | **Standalone, narrated.** Find My lists a second device called *Me* that is walking her night backwards. |
+| `arrived` | 60s | **Standalone, narrated.** Her phone says she got home at 23:11. There is a second phone in her flat, and it has her name on it. |
+| `28-km-60s` | 60s | The earlier 60 s cut of the same idea: *Me* walks her night backwards. |
 | `28-km` | 30s | The silent 30 s cut of the same idea, kept for comparison. |
 | `it-was-you` | 30s | **Part 4, the finale.** The phone on the floor records the message that part 1 receives. Ends on part 1's first frame. |
 | `its-inside` | 30s | **Part 3.** The call from part 2 is still up, and the phone is inside the house, walking towards you. |

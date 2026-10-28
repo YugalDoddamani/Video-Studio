@@ -1,0 +1,148 @@
+{
+  "slug": "arrived",
+  "title": "Arrived",
+  "generatedAt": "2026-10-28T19:24:09.962Z",
+  "format": {
+    "width": 1080,
+    "height": 1920,
+    "fps": 30
+  },
+  "totalFrames": 1800,
+  "durationSeconds": 60,
+  "toolchain": {
+    "node": "v22.22.3",
+    "ffmpeg": {
+      "source": "npm @ffmpeg-installer/ffmpeg",
+      "version": "ffmpeg version N-47683-g0e8eb07980-static https://johnvansickle.com/ffmpeg/  Copyright (c) 2000-2018 the FFmpeg developers"
+    },
+    "ffprobe": {
+      "source": "npm @ffprobe-installer/ffprobe",
+      "version": "ffprobe version N-66595-gc2b38619c0-static https://johnvansickle.com/ffmpeg/  Copyright (c) 2007-2023 the FFmpeg developers"
+    },
+    "chromium": {
+      "source": "@sparticuz/chromium (npm)",
+      "path": "/tmp/chromium"
+    }
+  },
+  "audio": "local",
+  "limitations": [],
+  "checks": [
+    {
+      "check": "File exists",
+      "ok": true,
+      "detail": "/home/user/Video-Studio/digital-suspense-studio/projects/arrived/output/final.mp4"
+    },
+    {
+      "check": "Container is MP4",
+      "ok": true,
+      "detail": "mov,mp4,m4a,3gp,3g2,mj2"
+    },
+    {
+      "check": "Has a video stream",
+      "ok": true,
+      "detail": "h264"
+    },
+    {
+      "check": "Resolution is 1080x1920",
+      "ok": true,
+      "detail": "1080x1920"
+    },
+    {
+      "check": "Codec is H.264",
+      "ok": true,
+      "detail": "h264"
+    },
+    {
+      "check": "Pixel format is yuv420p",
+      "ok": true,
+      "detail": "yuv420p"
+    },
+    {
+      "check": "Frame rate is 30 fps",
+      "ok": true,
+      "detail": "30 fps"
+    },
+    {
+      "check": "Frame count matches config",
+      "ok": true,
+      "detail": "1800 vs 1800"
+    },
+    {
+      "check": "Duration is about 60.00s",
+      "ok": true,
+      "detail": "60.00s"
+    },
+    {
+      "check": "Audio stream present",
+      "ok": true,
+      "detail": "aac @ 48000 Hz"
+    },
+    {
+      "check": "Audio codec is AAC",
+      "ok": true,
+      "detail": "aac"
+    }
+  ],
+  "preview": {
+    "frames": [
+      0,
+      10,
+      70,
+      140,
+      209,
+      210,
+      320,
+      430,
+      539,
+      540,
+      620,
+      700,
+      779,
+      780,
+      870,
+      960,
+      1049,
+      1050,
+      1140,
+      1230,
+      1319,
+      1320,
+      1390,
+      1460,
+      1529,
+      1530,
+      1620,
+      1710,
+      1799
+    ],
+    "skippedImages": false,
+    "dir": "preview/frames",
+    "errors": [],
+    "warnings": [],
+    "contactSheet": "preview/contact-sheet.png"
+  },
+  "render": {
+    "frames": 1800,
+    "seconds": 722.21,
+    "dir": "frames"
+  },
+  "probe": {
+    "durationSeconds": 60,
+    "sizeBytes": 6615046,
+    "video": {
+      "codec": "h264",
+      "width": 1080,
+      "height": 1920,
+      "pixelFormat": "yuv420p",
+      "fps": 30,
+      "frameCount": 1800,
+      "profile": "High"
+    },
+    "audio": {
+      "codec": "aac",
+      "sampleRate": 48000,
+      "channels": 1
+    }
+  },
+  "elapsedSeconds": 774.68
+}

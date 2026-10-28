@@ -9,8 +9,15 @@
     "fps": 30
   },
   "audio": {
-    "mode": "silent",
-    "tracks": []
+    "mode": "local",
+    "tracks": [
+      {
+        "file": "audio/mix.wav",
+        "role": "mix",
+        "source": "narration (eight takes) + synthesized score (room tone, five map blips, one relay click, one sub hit, one hollow tone)",
+        "note": "assembled by audio/build-audio.sh from the eight vo-*.mp3 takes in this folder"
+      }
+    ]
   },
   "captions": [
     {

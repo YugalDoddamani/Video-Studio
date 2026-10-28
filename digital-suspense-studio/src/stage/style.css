@@ -2046,43 +2046,57 @@ body {
 .room__wall {
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, #0c1018 0%, #0a0d14 44%, #05070b 100%);
+  /* A wall has a light side. Without this the plane is a flat fill and the
+     window frame reads as a rectangle floating on the screen. */
+  background:
+    radial-gradient(92% 62% at 22% 34%, rgba(34, 52, 78, 0.46) 0%, rgba(12, 16, 24, 0) 66%),
+    linear-gradient(180deg, #0a0e15 0%, #080b11 44%, #04060a 100%);
 }
 
 .room__window {
   position: absolute;
-  left: 112px;
-  top: 300px;
-  width: 296px;
-  height: 430px;
-  border: 3px solid rgba(150, 176, 212, 0.1);
-  background: linear-gradient(180deg, rgba(26, 40, 62, 0.34), rgba(8, 12, 19, 0.24));
-  box-shadow: inset 0 0 90px rgba(0, 0, 0, 0.85);
+  left: 104px;
+  top: 292px;
+  width: 300px;
+  height: 434px;
+  /* The frame is dark, not a bright hairline: street light comes through the
+     glass, and the timber around it is the darkest thing in the shot. */
+  border: 7px solid #0a0e15;
+  background: linear-gradient(
+    190deg,
+    rgba(78, 110, 152, 0.62) 0%,
+    rgba(36, 52, 78, 0.46) 46%,
+    rgba(12, 18, 28, 0.28) 100%
+  );
+  box-shadow:
+    0 0 70px 18px rgba(74, 106, 148, 0.13),
+    0 0 160px 44px rgba(50, 74, 108, 0.09),
+    inset 0 0 60px rgba(0, 0, 0, 0.55);
 }
 
-/* A mullion, so the shape reads as a window rather than a lit rectangle. */
+/* A mullion and a transom, so the shape reads as a sash window rather than a
+   lit rectangle. */
 .room__window::after {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    90deg,
-    rgba(0, 0, 0, 0) calc(50% - 3px),
-    rgba(8, 12, 19, 0.9) calc(50% - 3px),
-    rgba(8, 12, 19, 0.9) calc(50% + 3px),
-    rgba(0, 0, 0, 0) calc(50% + 3px)
-  );
+  background:
+    linear-gradient(90deg, rgba(0, 0, 0, 0) calc(50% - 3px), rgba(9, 13, 20, 0.95) calc(50% - 3px), rgba(9, 13, 20, 0.95) calc(50% + 3px), rgba(0, 0, 0, 0) calc(50% + 3px)),
+    linear-gradient(180deg, rgba(0, 0, 0, 0) calc(38% - 3px), rgba(9, 13, 20, 0.95) calc(38% - 3px), rgba(9, 13, 20, 0.95) calc(38% + 3px), rgba(0, 0, 0, 0) calc(38% + 3px));
 }
 
 .room__door {
   position: absolute;
-  right: 88px;
-  top: 236px;
-  width: 322px;
-  height: 742px;
-  background: linear-gradient(180deg, rgba(16, 21, 31, 0.95), rgba(5, 8, 12, 0.97));
-  border-left: 2px solid rgba(150, 176, 212, 0.07);
-  border-top: 2px solid rgba(150, 176, 212, 0.055);
+  right: 96px;
+  top: 228px;
+  width: 330px;
+  height: 756px;
+  /* No hairline border, and darker than the wall: the window is the only light
+     in the room, so the door on the far side is a deeper shade, not a panel. */
+  background: linear-gradient(180deg, rgba(8, 11, 17, 0.62), rgba(3, 5, 9, 0.86));
+  box-shadow:
+    inset 46px 0 56px -40px rgba(0, 0, 0, 0.95),
+    inset 0 0 110px rgba(0, 0, 0, 0.55);
 }
 
 /* Handle, at the height a handle actually sits. */
