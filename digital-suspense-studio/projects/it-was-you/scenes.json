@@ -1,0 +1,139 @@
+{
+  "title": "It Was You",
+  "slug": "it-was-you",
+  "fictional": true,
+  "fictionLabel": "FICTIONAL STORY",
+  "format": {
+    "width": 1080,
+    "height": 1920,
+    "fps": 30
+  },
+  "audio": {
+    "mode": "local",
+    "tracks": [
+      {
+        "file": "audio/mix.wav",
+        "role": "mix",
+        "source": "synthesized score (room tone, line hiss, footsteps, pick-up, record tick, chime) + processed voice-over",
+        "note": "assembled by audio/build-audio.sh from the vo-*.mp3 takes in this folder"
+      }
+    ]
+  },
+  "captions": [
+    {
+      "text": "nobody's holding it.",
+      "atFrame": 0,
+      "durationFrames": 120
+    },
+    {
+      "text": "the door is open.",
+      "atFrame": 120,
+      "durationFrames": 210
+    },
+    {
+      "text": "you got out.",
+      "atFrame": 330,
+      "durationFrames": 210
+    },
+    {
+      "text": "almost.",
+      "atFrame": 540,
+      "durationFrames": 60
+    },
+    {
+      "text": "you're recording this.",
+      "atFrame": 600,
+      "durationFrames": 120
+    },
+    {
+      "text": "you know how this ends.",
+      "atFrame": 720,
+      "durationFrames": 90
+    },
+    {
+      "text": "this voicemail is from TOMORROW",
+      "atFrame": 810,
+      "durationFrames": 84
+    }
+  ],
+  "scenes": [
+    {
+      "id": "scene-01-floor",
+      "type": "hallway",
+      "startFrame": 0,
+      "durationFrames": 600,
+      "data": {
+        "statusTime": "9:04",
+        "zoom": 1.3,
+        "zoomTo": 1.46,
+        "originY": 1460,
+        "originYTo": 1200,
+        "tilt": -7.5,
+        "tiltTo": 0,
+        "doorOpen": 1,
+        "lamp": 0.55,
+        "phoneGlow": 0,
+        "figure": {
+          "scale": 0.85,
+          "scaleTo": 0.46,
+          "y": 140,
+          "yTo": -40
+        },
+        "call": {
+          "caller": "You",
+          "callerSubtitle": "your number",
+          "timerStartSeconds": 58
+        },
+        "seed": "it-was-you-floor"
+      },
+      "events": []
+    },
+    {
+      "id": "scene-02-recorder",
+      "type": "recorder",
+      "startFrame": 600,
+      "durationFrames": 210,
+      "data": {
+        "statusTime": "9:05",
+        "label": "NEW VOICEMAIL",
+        "to": "to: Me",
+        "startSeconds": 0,
+        "seed": "it-was-you-rec"
+      },
+      "events": []
+    },
+    {
+      "id": "scene-03-loop",
+      "type": "lock-screen",
+      "startFrame": 810,
+      "durationFrames": 90,
+      "data": {
+        "statusTime": "8:47",
+        "time": "8:47",
+        "dateLabel": "Thursday, 12 June",
+        "appLabel": "VOICEMAIL",
+        "title": "Voicemail",
+        "body": "received TOMORROW, 6:47 AM",
+        "highlight": "TOMORROW",
+        "when": "now",
+        "darkRoom": true,
+        "wake": {
+          "atFrame": -16,
+          "durationFrames": 26
+        }
+      },
+      "events": [
+        {
+          "type": "show-notification",
+          "atFrame": 0,
+          "durationFrames": 10
+        },
+        {
+          "type": "highlight-timestamp",
+          "atFrame": 0,
+          "durationFrames": 8
+        }
+      ]
+    }
+  ]
+}

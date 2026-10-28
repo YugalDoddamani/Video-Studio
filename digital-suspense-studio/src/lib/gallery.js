@@ -133,6 +133,33 @@ function config() {
       events: [],
     },
     {
+      id: 'gallery-hallway',
+      type: 'hallway',
+      data: {
+        statusTime: '9:02',
+        zoom: 1,
+        zoomTo: 1.2,
+        doorOpen: 0.6,
+        lamp: 0.8,
+        figure: { scale: 0.5 },
+        call: { caller: 'You', callerSubtitle: 'your number', timerStartSeconds: 31 },
+        seed: 'gallery-hall',
+      },
+      events: [],
+    },
+    {
+      id: 'gallery-recorder',
+      type: 'recorder',
+      data: {
+        statusTime: '9:05',
+        label: 'NEW VOICEMAIL',
+        to: 'to: Me',
+        startSeconds: 0,
+        seed: 'gallery-rec',
+      },
+      events: [],
+    },
+    {
       id: 'gallery-alert',
       type: 'system-alert',
       data: {
