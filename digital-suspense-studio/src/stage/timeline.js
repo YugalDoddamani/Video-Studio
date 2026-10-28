@@ -64,11 +64,19 @@
         _index: eventIndex,
       }));
 
+      // Optional cross-fade into this scene from the one before it.
+      const rawTransition = scene.transition;
+      const transition =
+        rawTransition && rawTransition.type === 'fade' && positiveInt(rawTransition.durationFrames, 0) > 0
+          ? { type: 'fade', durationFrames: positiveInt(rawTransition.durationFrames, 12) }
+          : null;
+
       return {
         id: scene.id || `scene-${String(index + 1).padStart(2, '0')}`,
         type: scene.type || DEFAULTS.sceneType,
         startFrame,
         durationFrames,
+        transition,
         data: scene.data || {},
         events,
       };

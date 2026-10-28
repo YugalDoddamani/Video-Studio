@@ -89,6 +89,18 @@ function config() {
       events: [],
     },
     {
+      id: 'gallery-photo',
+      type: 'photo-viewer',
+      data: {
+        contact: 'Me',
+        headerSubtitle: 'your number',
+        stamp: '8:41 PM',
+        sinceLabel: 'sent just now',
+        caption: '8:41 PM · from your number',
+      },
+      events: [{ type: 'photo-received', atFrame: 6, durationFrames: 18 }],
+    },
+    {
       id: 'gallery-alert',
       type: 'system-alert',
       data: {

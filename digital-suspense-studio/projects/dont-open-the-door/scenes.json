@@ -1,0 +1,217 @@
+{
+  "title": "Don't Open the Door",
+  "slug": "dont-open-the-door",
+  "fictional": true,
+  "fictionLabel": "FICTIONAL STORY",
+  "description": "At 8:41 PM, Maya gets a text from her own number telling her not to open the door. Then it sends a photo of her sitting in the room she is sitting in.",
+  "format": {
+    "width": 1080,
+    "height": 1920,
+    "fps": 30
+  },
+  "audio": {
+    "mode": "silent",
+    "tracks": []
+  },
+  "scenes": [
+    {
+      "id": "scene-01-own-number",
+      "type": "message-thread",
+      "startFrame": 0,
+      "durationFrames": 330,
+      "data": {
+        "statusTime": "8:41",
+        "contact": "Me",
+        "headerSubtitle": "your number",
+        "messages": [
+          {
+            "kind": "separator",
+            "text": "Today 8:41 PM",
+            "atFrame": 18
+          },
+          {
+            "from": "them",
+            "text": "Don't open the door.",
+            "atFrame": 34,
+            "arriveFrames": 12
+          },
+          {
+            "from": "me",
+            "text": "Who is this?",
+            "atFrame": 96,
+            "arriveFrames": 10
+          },
+          {
+            "from": "me",
+            "text": "You're using my number.",
+            "atFrame": 132,
+            "arriveFrames": 10
+          },
+          {
+            "from": "them",
+            "attachment": {
+              "label": "Photo"
+            },
+            "atFrame": 210,
+            "arriveFrames": 14
+          }
+        ],
+        "typing": [
+          {
+            "startFrame": 78,
+            "endFrame": 96
+          },
+          {
+            "startFrame": 186,
+            "endFrame": 214
+          }
+        ]
+      },
+      "events": []
+    },
+    {
+      "id": "scene-02-photo",
+      "type": "photo-viewer",
+      "startFrame": 330,
+      "durationFrames": 300,
+      "transition": {
+        "type": "fade",
+        "durationFrames": 12
+      },
+      "data": {
+        "statusTime": "8:41",
+        "contact": "Me",
+        "headerSubtitle": "your number",
+        "stamp": "8:41 PM",
+        "sinceLabel": "sent just now",
+        "caption": "8:41 PM \u00b7 from your number"
+      },
+      "events": [
+        {
+          "type": "photo-received",
+          "atFrame": 24,
+          "durationFrames": 30
+        }
+      ]
+    },
+    {
+      "id": "scene-03-answer",
+      "type": "message-thread",
+      "startFrame": 630,
+      "durationFrames": 300,
+      "transition": {
+        "type": "fade",
+        "durationFrames": 12
+      },
+      "data": {
+        "statusTime": "8:43",
+        "contact": "Me",
+        "headerSubtitle": "your number",
+        "messages": [
+          {
+            "kind": "separator",
+            "text": "Today 8:43 PM",
+            "atFrame": 20
+          },
+          {
+            "from": "me",
+            "text": "Who took this?",
+            "atFrame": 34,
+            "arriveFrames": 10
+          },
+          {
+            "from": "them",
+            "text": "You did.",
+            "atFrame": 108,
+            "arriveFrames": 12
+          },
+          {
+            "from": "them",
+            "text": "Tomorrow.",
+            "atFrame": 172,
+            "arriveFrames": 12
+          }
+        ],
+        "typing": [
+          {
+            "startFrame": 76,
+            "endFrame": 108
+          },
+          {
+            "startFrame": 140,
+            "endFrame": 172
+          }
+        ]
+      },
+      "events": []
+    },
+    {
+      "id": "scene-04-door",
+      "type": "message-thread",
+      "startFrame": 930,
+      "durationFrames": 300,
+      "transition": {
+        "type": "fade",
+        "durationFrames": 12
+      },
+      "data": {
+        "statusTime": "8:47",
+        "contact": "Me",
+        "headerSubtitle": "your number",
+        "messages": [
+          {
+            "kind": "separator",
+            "text": "Today 8:47 PM",
+            "atFrame": 16
+          },
+          {
+            "from": "them",
+            "text": "Don't answer it.",
+            "atFrame": 30,
+            "arriveFrames": 12
+          },
+          {
+            "kind": "system",
+            "text": "Missed call \u00b7 your number \u00b7 8:48 PM",
+            "icon": "call",
+            "atFrame": 128,
+            "arriveFrames": 14
+          },
+          {
+            "from": "them",
+            "text": "I didn't listen either.",
+            "atFrame": 214,
+            "arriveFrames": 14
+          }
+        ],
+        "typing": []
+      },
+      "events": []
+    },
+    {
+      "id": "scene-05-end",
+      "type": "end-card",
+      "startFrame": 1230,
+      "durationFrames": 120,
+      "transition": {
+        "type": "fade",
+        "durationFrames": 18
+      },
+      "data": {
+        "lines": [
+          {
+            "text": "She never opened the door.",
+            "atFrame": 0
+          },
+          {
+            "text": "The door opened anyway.",
+            "atFrame": 22,
+            "accent": true
+          }
+        ],
+        "followPrompt": "New story every night."
+      },
+      "events": []
+    }
+  ]
+}

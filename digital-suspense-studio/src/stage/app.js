@@ -50,6 +50,25 @@
     if (!scene) {
       return '<div class="stage"><div class="error">This project has no scenes.</div></div>';
     }
+
+    // Cross-fade: during the first N frames of a scene, hold the previous
+    // scene's final frame underneath and fade the new one in over it.
+    const transition = scene.transition;
+    if (transition && transition.type === 'fade' && index > 0) {
+      const local = globalFrame - scene.startFrame;
+      if (local < transition.durationFrames) {
+        const previous = config.scenes[index - 1];
+        const previousFrame = previous.startFrame + previous.durationFrames - 1;
+        const progress = Motion.clamp01(local / transition.durationFrames);
+        const outgoing = Scenes.renderScene(previous, frameState(config, previous, previousFrame));
+        const incoming = Scenes.renderScene(scene, frameState(config, scene, globalFrame));
+        return (
+          `<div class="layer">${outgoing}</div>` +
+          `<div class="layer" style="opacity:${progress.toFixed(4)}">${incoming}</div>`
+        );
+      }
+    }
+
     return Scenes.renderScene(scene, frameState(config, scene, globalFrame));
   }
 
