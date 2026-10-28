@@ -148,6 +148,10 @@ often has to outlive the scene it started in:
 - `validate` warns when a card is longer than five words, overlaps the previous
   card, runs past the end of the film, or repeats a line of dialogue verbatim.
   Captions are a second narrator, not subtitles.
+- `"lift": 700` raises one card out of the band, in pixels. A scene whose own
+  interface owns the lower third — a chat thread, a tall sheet — sets this rather
+  than burying the card under the UI. It is a per-card escape hatch, not a
+  per-scene position: the band stays the same for every other card in the film.
 
 ### Windowed transcript
 
@@ -335,6 +339,14 @@ Three rules keep the surface honest:
   streets grow around her and she never moves.
 - **The map never malfunctions.** Every number on screen is correct for what it is
   tracking; the impossibility belongs to the world, not the software.
+
+A second beat uses the same card one level deeper: `history` is a list of
+`{ name, meta, atFrame }` rows, each fading in on its own frame, and
+`historySheetAtFrame` swaps the device rows for that list at a given frame — tapping a
+device, not opening a new screen. `sheetTop` accepts a keyframe list like the others, so
+the card can rise; in `28-km-60s` it settles at 840 px and the list grows downward from
+under the header. Keep it at or below ~840 px if a caption is on screen: the caption band
+sits at 1180 px.
 
 Street geometry is generated once per `seed` (`mapGeometry`) from the same PRNG the
 rest of the stage uses and cached, so a re-render is byte-identical. `empty: true`

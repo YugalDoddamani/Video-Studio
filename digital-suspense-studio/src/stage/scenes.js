@@ -466,7 +466,11 @@
     // What is dying on screen. A voicemail player is the default; a live call is
     // passed in whole, chrome and self-view included, so the whole frame tears.
     const callData = data.call || {};
-    const inner = data.picture === 'call'
+    // A map that is already on screen when the phone dies must die too: the
+    // tear belongs to the picture the viewer was looking at, not to a stand-in.
+    const inner = data.picture === 'map'
+      ? mapInnerHtml(Object.assign({ statusTime: '23:58' }, data.map || {}), state)
+      : data.picture === 'call'
       ? Components.callView(
           Object.assign({}, callData, { timer: callData.timer || Components.timerLabel(callData.timerSeconds) })
         )
@@ -703,17 +707,19 @@
   // because the app is wrong.
   // ---------------------------------------------------------------------------
 
-  function renderMap(scene, state) {
-    const data = scene.data || {};
+  /** Status bar + map, without the stage wrapper or the disclosure.
+   *
+   *  Split out so a scene that tears the picture (signal-loss) can tear the
+   *  same map the viewer was already looking at, instead of substituting a
+   *  different app behind the static.
+   */
+  function mapInnerHtml(data, state) {
     const frame = state.localFrame;
 
     if (data.empty) {
       return `
-        <div class="stage stage--map">
           ${Components.statusBar({ time: data.statusTime })}
-          ${Components.mapView({ empty: true, emptyTitle: data.emptyTitle, emptySub: data.emptySub })}
-          ${fictionFooter(state, { fromFrame: 8, fadeFrames: 16 })}
-        </div>`;
+          ${Components.mapView({ empty: true, emptyTitle: data.emptyTitle, emptySub: data.emptySub })}`;
     }
 
     const zoom = keyframes(frame, data.zoom);
@@ -754,26 +760,56 @@
         dist: distanceText,
       },
       gone
-        ? { name: data.goneName || 'No location found', meta: data.goneMeta || 'Last updated —', tone: 'muted' }
+        ? { name: data.goneName || 'No location found', meta: data.goneMeta || 'Last updated \u2014', tone: 'muted' }
         : { name: data.selfName || 'This iPhone', meta: data.selfMeta || 'You are here', dist: 'now' },
     ];
 
+    // A sheet can also *grow*: `sheetTop` accepts a keyframe list so the card
+    // rises up the screen instead of appearing at its final height.
+    const sheetTop = Array.isArray(data.sheetTop) ? keyframes(frame, data.sheetTop) : Number(data.sheetTop);
+
+    // "Where it's been" is evidence, so each line arrives when it is mentioned
+    // rather than printing the whole history at once.
+    const history = (Array.isArray(data.history) ? data.history : []).map((entry) => ({
+      name: entry.name,
+      meta: entry.meta,
+      atFrame: entry.atFrame,
+      fadeFrames: entry.fadeFrames,
+    }));
+
+    const historyOpacity = Array.isArray(data.historyOpacity)
+      ? keyframes(frame, data.historyOpacity)
+      : Number.isFinite(Number(data.historyOpacity))
+        ? Number(data.historyOpacity)
+        : 1;
+
+    return `
+          ${Components.statusBar({ time: data.statusTime })}
+          ${Components.mapView({
+            seed: data.seed,
+            zoom,
+            panX: Number(data.panX) || 0,
+            panY: Number(data.panY) || 0,
+            accuracy: 1 + (1 - clamp01(metres / 2800)) * 0.4,
+            self: { x: 540, y: 720, opacity: selfOpacity },
+            other: { x: pinX, y: pinY, label: flipped ? data.labelAfter : data.labelBefore, flash },
+            chip: { value: distance.value, unit: distance.unit },
+            banner,
+            rows,
+            sheetTitle: data.sheetTitle,
+            sheetTop: Number.isFinite(sheetTop) ? sheetTop : undefined,
+            historySheet:
+              Number.isFinite(Number(data.historySheetAtFrame)) && frame >= Number(data.historySheetAtFrame),
+            history,
+            historyOpacity,
+            frame,
+          })}`;
+  }
+
+  function renderMap(scene, state) {
     return `
       <div class="stage stage--map">
-        ${Components.statusBar({ time: data.statusTime })}
-        ${Components.mapView({
-          seed: data.seed,
-          zoom,
-          panX: Number(data.panX) || 0,
-          panY: Number(data.panY) || 0,
-          accuracy: 1 + (1 - clamp01(metres / 2800)) * 0.4,
-          self: { x: 540, y: 720, opacity: selfOpacity },
-          other: { x: pinX, y: pinY, label: flipped ? data.labelAfter : data.labelBefore, flash },
-          chip: { value: distance.value, unit: distance.unit },
-          banner,
-          rows,
-          sheetTitle: data.sheetTitle,
-        })}
+        ${mapInnerHtml(scene.data || {}, state)}
         ${fictionFooter(state, { fromFrame: 8, fadeFrames: 16 })}
       </div>`;
   }

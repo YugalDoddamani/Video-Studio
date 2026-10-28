@@ -3,6 +3,8 @@
 The editorial backlog for the video studio. One record per serious candidate.
 
 **Selection rule:** pick the highest-scoring topic with status `shortlisted`. Do not pick by checkbox order.
+**Voice-over:** every reel is narrated (`docs/02-story-and-writing.md`). A topic that cannot carry a
+first-person spoken line inside the hook window is not eligible, however good the image is.
 **Lifecycle (one state only):** `idea → shortlisted → scripted → in-production → rendered → reviewed → published → measured`
 **Scoring (§4.2):** 1–5 on hook clarity, curiosity, payoff potential, originality, visual readability, participation, production feasibility — weighted 20/20/20/15/10/10/5 to a score out of 100. `80+` shortlist · `65–79` improve the premise · `<65` hold or retire.
 **Nothing in this repository has been published.** No record here has a post URL, a publication date, or a metric. Per §4.4 a topic reaches `published` only when a human confirms the actual post.
