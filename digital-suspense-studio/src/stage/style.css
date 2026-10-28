@@ -2886,7 +2886,7 @@ body {
   inset: 0;
   background:
     linear-gradient(180deg, rgba(5, 8, 13, 0.94) 0%, rgba(5, 8, 13, 0.42) 240px, rgba(5, 8, 13, 0) 430px),
-    linear-gradient(0deg, rgba(5, 8, 13, 0.9) 0%, rgba(5, 8, 13, 0.62) 300px, rgba(5, 8, 13, 0) 640px);
+    linear-gradient(0deg, rgba(5, 8, 13, 0.86) 0%, rgba(5, 8, 13, 0.45) 240px, rgba(5, 8, 13, 0) 520px);
 }
 
 .map__accuracy {
@@ -2920,17 +2920,6 @@ body {
   border: 2px solid rgba(109, 183, 255, 0.22);
 }
 
-.map__pin-dot {
-  position: absolute;
-  width: 34px;
-  height: 34px;
-  margin: -17px 0 0 -17px;
-  border-radius: 50%;
-  background: #e7edf5;
-  border: 5px solid #16202c;
-  box-shadow: 0 0 0 4px rgba(6, 10, 16, 0.6), 0 6px 18px rgba(0, 0, 0, 0.6);
-}
-
 .map__pin {
   position: absolute;
   transform: translate(-50%, calc(-100% - 26px));
@@ -2943,6 +2932,7 @@ body {
   position: absolute;
   width: 26px;
   height: 26px;
+  margin: 0;
   transform: translate(-50%, -50%);
   border-radius: 50%;
   background: #f2f6fb;
@@ -2971,6 +2961,90 @@ body {
 .map__pin-chip--flash {
   background: rgba(109, 183, 255, 0.3);
   border-color: rgba(109, 183, 255, 0.85);
+}
+
+/* A house is the one map symbol nobody has to be taught, so the flat gets a
+   glyph instead of a label pretending to be a pin. Width 0 keeps the glyph
+   centred on the anchor while the label hangs below it. */
+.map__home {
+  position: absolute;
+  width: 0;
+  height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.map__home-glyph {
+  width: 76px;
+  height: 76px;
+  margin-top: -38px;
+  border-radius: 22px;
+  background: #eef3fa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow:
+    0 0 0 7px rgba(238, 243, 250, 0.1),
+    0 10px 32px rgba(0, 0, 0, 0.6);
+}
+
+.map__home-label {
+  margin-top: 16px;
+  font-size: 25px;
+  font-weight: 600;
+  letter-spacing: 2.6px;
+  text-transform: uppercase;
+  color: rgba(238, 243, 250, 0.7);
+  text-shadow: 0 3px 16px rgba(0, 0, 0, 0.95);
+  white-space: nowrap;
+}
+
+/* The outline that makes "zoom into the flat" mean something. */
+.map__flat {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  border: 2px solid rgba(238, 243, 250, 0.42);
+  border-radius: 6px;
+  background: rgba(238, 243, 250, 0.045);
+}
+
+/* ----------------------------------------------------------- camera feed */
+
+/* Doorbell and hall cameras put their own chrome on the picture: a channel
+   name, a live dot and a clock. Without it the corridor reads as a room. */
+.feedbar {
+  position: absolute;
+  left: 62px;
+  right: 62px;
+  top: 150px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 25px;
+  font-weight: 600;
+  letter-spacing: 2.2px;
+  color: rgba(240, 246, 252, 0.82);
+  text-shadow: 0 3px 16px rgba(0, 0, 0, 0.95);
+}
+
+.feedbar__left {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.feedbar__live {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #ff4d5b;
+  box-shadow: 0 0 0 5px rgba(255, 77, 91, 0.16);
+}
+
+.feedbar__right {
+  font-variant-numeric: tabular-nums;
+  color: rgba(240, 246, 252, 0.6);
 }
 
 .map__chip {
